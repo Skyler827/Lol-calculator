@@ -1,4 +1,4 @@
-.venv/
 venv/
 .vscode/
+data/
 api_key.txt
