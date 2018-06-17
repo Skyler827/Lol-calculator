@@ -2,3 +2,4 @@ venv/
 .vscode/
 data/
 api_key.txt
+__pycache__
