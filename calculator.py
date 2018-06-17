@@ -2,7 +2,6 @@ from typing import Dict, Tuple, List, IO
 from enum import Enum
 import math
 import json
-import functools
 import sqlite3
 
 class DamageType(Enum):
@@ -152,6 +151,18 @@ class Champion:
         attack = Damage(DamageType.PHYSICAL, amount=self.get_attackdamage(), \
             pen_armor_percent=self.pen_armor_percent, pen_lethality=self.pen_lethality)
         target.take_damage(attack)
+    def buy_item(self, item):
+        pass
+    def sell_item(self, item):
+        pass
+    def Spell1(self, target):
+        pass
+    def Spell2(self, target):
+        pass
+    def Spell3(self, target):
+        pass
+    def Spell4(self, target):
+        pass
     def die(self) -> None:
         pass
 class ChampStatusModifier:
