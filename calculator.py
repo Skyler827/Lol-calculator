@@ -1,25 +1,60 @@
 from typing import Dict, Tuple, List, IO
-from enum import Enum
+from enum import Enum, auto
 import math
 import json
 import sqlite3
 import abc
 
 class DamageType(Enum):
-    PHYSICAL = 1
-    MAGICAL = 2
-    TRUE = 3
-    PURE = 4
-class ResourceBar(Enum):
-    MANA = 1
-    ENERGY = 2
-    NONE = 3
+    PHYSICAL = auto()
+    MAGICAL = auto()
+    TRUE = auto()
+    PURE = auto()
+class ResourceBarType(Enum):
+    MANA = auto() # most champions
+    ENERGY = auto() #Zed, Shen, Lee Sin, Kennen, Akali
+    FEROCITY = auto() #Rengar
+    FURY = auto() #Renekton, Tryndamere, Rek'Sai, Shyvana
+    RAGE = auto() # Gnar
+    COURAGE = auto() #Kled
+    HEAT = auto() #Rumble
+    BLOOD = auto() #Aatrox
+    SHIELD = auto() #Mordekaiser
+    BLOODTHIRST = auto() #Vladimir
+    FLOW = auto() #Yasuo
+    NONE = auto() # Mundo, Garen, Katarina, Zac, Riven
 class DamageRatio(Enum):
-    FLAT = 1
-    PERCENT_MAX_HP = 2
-    PERCENT_MISSING_HP = 3
-    PERCENT_CURRENT_HP = 4
-class Damage:
+    FLAT = auto()
+    PERCENT_MAX_HP = auto()
+    PERCENT_CURRENT_HP = auto()
+    PERCENT_MISSING_HP = auto()
+class ChampStatistic(Enum):
+    #statistics that can be modified by items
+    HP = auto()
+    HP_PERCENT = auto()
+    MANA = auto()
+    MOVE_SPEED_FLAT = auto()
+    MOVE_SPEED_PERCENT = auto()
+    ARMOR = auto()
+    ARMOR_PERCENT = auto()
+    MAGIC_RESIST = auto()
+    ATTACK_RANGE = auto()
+    ATTACK_RANGE_PERCENT = auto()
+    HP_REGEN = auto()
+    HP_REGEN_PERCENT = auto()
+    MANA_REGEN = auto()
+    MANA_REGEN_PERCENT = auto()
+    CRIT_CHANCE = auto()
+    CRIT_DAMAGE = auto()
+    ATTACK_DAMAGE = auto()
+    ATTACK_SPEED_PERCENT = auto()
+    ABILITY_POWER = auto()
+    ABILITY_POWER_PERCENT = auto()
+    SPELL_VAMP = auto()
+    DEATHS_DANCE_HEAL = auto()
+    GUNBLADE_HEAL = auto()
+    ELIXIR_OF_WRATH_HEAL = auto()
+class Damage():
     def __init__(self, type:DamageType, amount:float=0, pen_armor_percent:List[float]=[], 
     pen_lethality:float=0, pen_magic_flat:float=0, pen_magic_percent:List[float]=[]):
         self.pen_armor_percent: List[float] = pen_armor_percent
@@ -28,20 +63,6 @@ class Damage:
         self.pen_magic_percent: List[float] = pen_magic_percent
         self.type: DamageType = type
         self.amount: float = amount
-class onHitEffect():
-    def __init__(self, type:DamageType, damageamount:float, damageRatio:DamageRatio):
-        self.type = type
-        pass
-    def getDamage(self, target) -> Damage:
-        if self.type == DamageRatio.FLAT:
-            pass
-        elif self.type == DamageRatio.PERCENT_MAX_HP:
-            pass
-        elif self.type == DamageRatio.PERCENT_MISSING_HP:
-            pass
-        elif self.type == DamageRatio.PERCENT_CURRENT_HP:
-            pass
-        return Damage(self.type)
 class AbstractMinion(abc.ABC):
     @abc.abstractclassmethod
     def __init__(self, name:str):
@@ -92,7 +113,6 @@ class AbstractMinion(abc.ABC):
         self.buffs = [ChampStatusModifier]
         self.debuffs = [ChampStatusModifier]
         self.hp:float = 0
-        self.mp:float = 0
         self.exp: int = 0
     def get_maxhp(self) -> float:
         return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * self.hp_bonus_percent
@@ -118,25 +138,33 @@ class AbstractMinion(abc.ABC):
         x -= self.spellblock_reduction_flat
         x *= (1 - self.spellblock_reduction_percent)
         return x
-    def gain_exp(self, exp_amount: int) -> None:
-        assert(exp_amount > 0)
-        self.exp += exp_amount
-        should_be_level = math.floor(50*self.exp**2+130*self.exp-180)
-        while (self.level < should_be_level):
-            self.level_up()
-        assert(self.level == should_be_level)
-    def level_up(self) -> None:
-        hp_percent = self.hp / self.get_maxhp()
-        mp_percent = self.mp / self.get_maxmp()
-        self.level += 1
-        self.hp = hp_percent * self.get_maxhp()
-        self.mp = mp_percent * self.get_maxmp()
     @abc.abstractmethod
     def take_damage(self, attack: Damage) -> None:
         pass
+class ChampStatusModifier:
+    def __init__(self, name:str, attribute_modifiers:Dict[ChampStatistic, int]):
+        self.name = name
+        self.attribute_modifiers = attribute_modifiers
+class Buff(ChampStatusModifier):
+    def __init__(self):
+        super()
+class Debuff(ChampStatusModifier):
+    def __init__(self):
+        super()
+class onHitEffect():
+    def __init__(self, type:DamageType, damageamount:float, damageRatio:DamageRatio, debuff:Debuff):
+        self.type:DamageType = type
+        self.damageamount:float = damageamount
+        self.damageRatio:DamageRatio = damageRatio
+        self.debuff = debuff
+class Item:
+    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, int]], unique_passives:List[Tuple[str, Tuple[ChampStatistic, int]]], passive_effect:Buff):
+        self.attribute_modifiers = attribute_modifiers
+        self.unique_passives = unique_passives
+        self.passive_effect = passive_effect
 class Champion(AbstractMinion):
     def __init__(self, name:str):
-        conn = sqlite3.connect("data/champdata.sqlite")
+        conn = sqlite3.connect("champdata.sqlite")
         c = conn.cursor()
         r: Dict[str, float] = c.execute("SELECT * FROM champions WHERE id=? OR name=?", name).fetchone()
 
@@ -190,15 +218,14 @@ class Champion(AbstractMinion):
 
         # dynamic quantities:
         self.level: int = 1
-        self.items = []
-        self.buffs = []
-        self.debuffs = []
-        self.hp = self.get_maxhp()
-        self.mp = self.get_maxmp()
+        self.items: [Item] = []
+        self.buffs: [Buff] = []
+        self.debuffs: [Debuff] = []
+        self.hp: float = self.get_maxhp()
         self.exp: int = 0
         self.gold: int = 0
         self.shield = []
-        self.onHitEffects = [onHitEffect]
+        self.onHitEffects: [onHitEffect] = []
     def get_maxhp(self) -> float:
         return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * self.hp_bonus_percent
     def get_maxmp(self) -> float:
@@ -207,22 +234,6 @@ class Champion(AbstractMinion):
         return self.attackdamage_base + (self.level-1) * self.attackdamage_perlevel
     def get_abilitypower(self) -> float:
         return self.abilitypower_flat * (1 + self.abilitypower_percent/100)
-    def get_armor(self) -> float:
-        x = self.armor_base
-        x += self.armor_perlevel*self.level
-        x += self.armor_bonus
-        x *= (1+self.armor_bonus_percent/100)
-        x -= self.armor_reduction_flat
-        x *= (1- self.armor_reduction_percent)
-        return x 
-    def get_magic_resist(self) -> float:
-        x = self.spellblock_base
-        x += self.spellblock_perlevel*self.level
-        x += self.spellblock_bonus
-        x *= (1+self.spellblock_bonus_percent/100)
-        x -= self.spellblock_reduction_flat
-        x *= (1 - self.spellblock_reduction_percent)
-        return x
     def gain_exp(self, exp_amount: int) -> None:
         assert(exp_amount > 0)
         self.exp += exp_amount
@@ -256,6 +267,8 @@ class Champion(AbstractMinion):
             self.hp -=  damage
         elif attack.type == DamageType.TRUE:
             self.hp -= (attack.amount) * (1-self.damagereduction_percent/100)
+        elif attack.type == DamageType.PURE:
+            self.hp -= (attack.amount)
         else:
             raise Exception
         if self.hp <= 0:
@@ -265,7 +278,8 @@ class Champion(AbstractMinion):
             pen_armor_percent=self.pen_armor_percent, pen_lethality=self.pen_lethality)
         target.take_damage(attack)
         for effect in self.onHitEffects:
-            effect.getDamage(effect, target)
+            target.take_damage(effect.getDamage(effect, target))
+
     def buy_item(self, item):
         pass
     def sell_item(self, item):
@@ -281,11 +295,8 @@ class Champion(AbstractMinion):
     def die(self) -> None:
         pass
 
-#Buffs and debuffs
-class ChampStatusModifier:
-    def __init__(self, AbstractMinion):
-        pass
 
 def main():
-    pass
+    c = Champion("Lulu")
+    c.take_damage(Damage(DamageType.PHYSICAL, amount=100))
 main()
