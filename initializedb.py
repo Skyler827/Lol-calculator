@@ -32,7 +32,8 @@ def main() -> None:
     conn2 = sqlite3.connect('file:champdata.db?mode=rw', uri=True)
     c2 = conn2.cursor()
     url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
-    #`urllib.request.urlretrieve(url, filename=json_local_filename)
+    if os.path.isfile(json_local_filename): pass
+    else: urllib.request.urlretrieve(url, filename=json_local_filename)
     data: Dict = json.load(open(json_local_filename))
     no_of_champs = 0
     for _, champ in data["data"].items():
