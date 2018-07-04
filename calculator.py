@@ -98,7 +98,7 @@ class ChampStatistic(Enum):
     TRUE_ONHIT_DRAIN = auto()
 
 class Damage():
-    def __init__(self, type:DamageType, amount:float=0, pen_armor_percent:List[float]=[], 
+    def __init__(self, type:DamageType, ratio:DamageRatio=DamageRatio.FLAT, amount:float=0, pen_armor_percent:List[float]=[], 
     pen_lethality:float=0, pen_magic_flat:float=0, pen_magic_percent:List[float]=[]):
         self.pen_armor_percent: List[float] = pen_armor_percent
         self.pen_lethality: float = pen_lethality
@@ -106,6 +106,7 @@ class Damage():
         self.pen_magic_percent: List[float] = pen_magic_percent
         self.type: DamageType = type
         self.amount: float = amount
+        self.ratio = ratio
 class AbstractMinion(abc.ABC):
     @abc.abstractclassmethod
     def __init__(self, name:str):
@@ -207,10 +208,10 @@ class Item:
         self.passive_effect = passive_effect
 class Champion(AbstractMinion):
     def __init__(self, name:str):
-        conn = sqlite3.connect("champdata.sqlite")
+        conn = sqlite3.connect("champdata.db")
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        r: Dict[str, float] = c.execute("SELECT * FROM champions WHERE id=? OR name=?", name).fetchone()
-
+        r:sqlite3.Row = c.execute("SELECT * FROM champions WHERE id=:name OR name=:name", {"name":name}).fetchone()
         # static quantities:
         self.hp_base = r["hp"]
         self.hp_perlevel = r["hpperlevel"]
@@ -248,7 +249,7 @@ class Champion(AbstractMinion):
         self.attackdamage_base = r["attackdamage"]
         self.attackdamage_perlevel = r["attackdamageperlevel"]
         self.attackdamage_bonus = 0
-        self.attackspeed_offset = r["attackspeedoffest"]
+        self.attackspeed_offset = r["attackspeedoffset"]
         self.attackspeed_perlevel = r["attackspeedperlevel"]
         self.abilitypower_flat = 0
         self.abilitypower_percent = 0
