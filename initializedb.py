@@ -13,7 +13,7 @@ real_attributes: List[str] = [
     "crit", "critperlevel", "attackdamage","attackdamageperlevel", "attackspeedoffset","attackspeedperlevel"
 ]
 def main() -> None:
-    conn = sqlite3.connect('champdata.db?mode=rwc')
+    conn = sqlite3.connect('file:champdata.db?mode=rwc')
     json_local_filename = 'champion.json'
     c = conn.cursor()
     create_table_sql = "CREATE TABLE champions (" + \
@@ -23,12 +23,13 @@ def main() -> None:
     print(create_table_sql)
     try: c.execute(create_table_sql)
     except sqlite3.OperationalError as e:
-        if str(e) == "table champions already exists": pass
+        if str(e) == "table champions already exists":
+            print("table champions already exists, passing")
         else: raise Exception()
     c.close()
     conn.commit()
     conn.close()
-    conn2 = sqlite3.connect('champdata.db?mode=rw')
+    conn2 = sqlite3.connect('file:champdata.db?mode=rw')
     c2 = conn2.cursor()
     url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
     #`urllib.request.urlretrieve(url, filename=json_local_filename)
