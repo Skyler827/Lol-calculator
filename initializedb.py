@@ -13,7 +13,7 @@ real_attributes: List[str] = [
     "crit", "critperlevel", "attackdamage","attackdamageperlevel", "attackspeedoffset","attackspeedperlevel"
 ]
 def main() -> None:
-    conn = sqlite3.connect('file:champdata.db?mode=rwc')
+    conn = sqlite3.connect('file:champdata.db?mode=rwc', uri=True)
     json_local_filename = 'champion.json'
     c = conn.cursor()
     create_table_sql = "CREATE TABLE champions (" + \
@@ -29,7 +29,7 @@ def main() -> None:
     c.close()
     conn.commit()
     conn.close()
-    conn2 = sqlite3.connect('file:champdata.db?mode=rw')
+    conn2 = sqlite3.connect('file:champdata.db?mode=rw', uri=True)
     c2 = conn2.cursor()
     url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
     #`urllib.request.urlretrieve(url, filename=json_local_filename)

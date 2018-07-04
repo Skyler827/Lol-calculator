@@ -2,5 +2,6 @@ venv/
 .vscode/
 champion.json
 api_key.txt
-champdata.sqlite
+champdata.db
+file
 __pycache__
