@@ -5,7 +5,7 @@ import json
 import sqlite3
 
 latest_patch: str = "8.13.1"
-text_attributes: List[str] = ["id", "name", "title", "blurb"]
+text_attributes: List[str] = ["id", "name", "title", "blurb", "partype"]
 int_attributes: List[str] = ["key"]
 real_attributes: List[str] = [
     "hp", "hpperlevel", "mp", "mpperlevel", "movespeed", "armor", "armorperlevel","spellblock",

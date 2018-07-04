@@ -10,7 +10,7 @@ class DamageType(Enum):
     MAGICAL = auto()
     TRUE = auto()
     PURE = auto()
-class ResourceBarType(Enum):
+class ResourceBarType(Enum): 
     MANA = auto() # most champions
     ENERGY = auto() #Zed, Shen, Lee Sin, Kennen, Akali
     FEROCITY = auto() #Rengar
@@ -18,18 +18,31 @@ class ResourceBarType(Enum):
     RAGE = auto() # Gnar
     COURAGE = auto() #Kled
     HEAT = auto() #Rumble
-    BLOOD = auto() #Aatrox
+    BLOODWELL = auto() #Aatrox
     SHIELD = auto() #Mordekaiser
     BLOODTHIRST = auto() #Vladimir
     FLOW = auto() #Yasuo
-    NONE = auto() # Mundo, Garen, Katarina, Zac, Riven
+    NO_BAR = auto() # Mundo, Garen, Katarina, Zac, Riven
+def resourcebar_from_text(type: str) -> ResourceBarType:
+    if type == "Mana": return ResourceBarType.MANA
+    elif type == "Energy": return ResourceBarType.ENERGY
+    elif type == "Ferocity": return ResourceBarType.FEROCITY
+    elif type == "Fury": return ResourceBarType.FURY
+    elif type == "Rage": return ResourceBarType.RAGE
+    elif type == "Courage": return ResourceBarType.COURAGE
+    elif type == "Heat": return ResourceBarType.HEAT
+    elif type == "Blood Well": return ResourceBarType.BLOODWELL
+    elif type == "Shield": return ResourceBarType.SHIELD
+    elif type == "Bloodthirst": return ResourceBarType.BLOODTHIRST
+    elif type == "Flow": return ResourceBarType.FLOW
+    elif type == "None": return ResourceBarType.NO_BAR 
 class DamageRatio(Enum):
     FLAT = auto()
     PERCENT_MAX_HP = auto()
     PERCENT_CURRENT_HP = auto()
     PERCENT_MISSING_HP = auto()
 class ChampStatistic(Enum):
-    #statistics that can be modified by items, buffs, debuffs
+    # statistics that can be modified by items, spell effects, buffs, or debuffs
     HP = auto()
     HP_BONUS_PERCENT = auto()
     MANA = auto()
@@ -78,19 +91,19 @@ class ChampStatistic(Enum):
     MAGICAL_AOE_CHAMPION_SPELL_VAMP = auto()
     MAGICAL_AOE_NONCHAMPION_SPELL_VAMP = auto()
     MAGICAL_ONHIT_VAMP = auto()
-    #Magical Spell Drain:
+    #Magical spell drain:
     MAGICAL_TARGETED_CHAMPION_SPELL_DRAIN = auto()
     MAGICAL_TARGETED_NONCHAMPION_SPELL_DRAIN = auto()
     MAGICAL_AOE_CHAMPION_SPELL_DRAIN = auto()
     MAGICAL_AOE_NONCHAMPION_SPELL_DRAIN = auto()
     MAGICAL_ONHIT_DRAIN = auto()
-    #True Spell Vamp:
+    #True spell vamp:
     TRUE_TARGETED_CHAMPION_SPELL_VAMP = auto()
     TRUE_TARGETED_NONCHAMPION_SPELL_VAMP = auto()
     TRUE_AOE_CHAMPION_SPELL_VAMP = auto()
     TRUE_AOE_NONCHAMPION_SPELL_VAMP = auto()
     TRUE_ONHIT_VAMP = auto()
-    #True Spell Drain:
+    #True spell drain:
     TRUE_TARGETED_CHAMPION_SPELL_DRAIN = auto()
     TRUE_TARGETED_NONCHAMPION_SPELL_DRAIN = auto()
     TRUE_AOE_CHAMPION_SPELL_DRAIN = auto()
@@ -220,6 +233,7 @@ class Champion(AbstractMinion):
         self.mp_base = r["mp"]
         self.mp_perlevel = r["mpperlevel"]
         self.mp_bonus = 0
+        self.bartype:ResourceBarType = resourcebar_from_text(r["partype"])
         self.movespeed_base = r["movespeed"]
         self.movespeed_bonus_flat = 0
         self.movespeed_bonus_percent = 0
@@ -287,10 +301,8 @@ class Champion(AbstractMinion):
         assert(self.level == should_be_level)
     def level_up(self) -> None:
         hp_percent = self.hp / self.get_maxhp()
-        mp_percent = self.mp / self.get_maxmp()
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
-        self.mp = mp_percent * self.get_maxmp()
     def take_damage(self, attack: Damage) -> None:
         if attack.type == DamageType.PHYSICAL:
             armor = self.get_armor()
