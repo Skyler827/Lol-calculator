@@ -1,6 +1,7 @@
 venv/
 .vscode/
 champion.json
+item.json
 api_key.txt
 champdata.db
 file

@@ -4,12 +4,9 @@ import math
 import json
 import sqlite3
 import abc
-
-class DamageType(Enum):
-    PHYSICAL = auto()
-    MAGICAL = auto()
-    TRUE = auto()
-    PURE = auto()
+from champ_statistics import ChampStatistic
+from damage_type import DamageType
+from damage_ratio import DamageRatio
 class ResourceBarType(Enum): 
     MANA = auto() # most champions
     ENERGY = auto() #Zed, Shen, Lee Sin, Kennen, Akali
@@ -36,79 +33,7 @@ def resourcebar_from_text(type: str) -> ResourceBarType:
     elif type == "Bloodthirst": return ResourceBarType.BLOODTHIRST
     elif type == "Flow": return ResourceBarType.FLOW
     elif type == "None": return ResourceBarType.NO_BAR 
-class DamageRatio(Enum):
-    FLAT = auto()
-    PERCENT_MAX_HP = auto()
-    PERCENT_CURRENT_HP = auto()
-    PERCENT_MISSING_HP = auto()
-class ChampStatistic(Enum):
-    # statistics that can be modified by items, spell effects, buffs, or debuffs
-    HP = auto()
-    HP_BONUS_PERCENT = auto()
-    MANA = auto()
-    MOVE_SPEED_FLAT = auto()
-    MOVE_SPEED_PERCENT = auto()
-    TENACITY = auto()
-    SLOW_RESIST = auto()
-    ARMOR = auto()
-    ARMOR_PERCENT = auto()
-    MAGIC_RESIST = auto()
-    ATTACK_RANGE = auto()
-    ATTACK_RANGE_PERCENT = auto()
-    HP_REGEN = auto()
-    HP_REGEN_PERCENT = auto()
-    MANA_REGEN = auto()
-    MANA_REGEN_PERCENT = auto()
-    CRIT_CHANCE = auto()
-    CRIT_DAMAGE = auto()
-    ATTACK_DAMAGE = auto()
-    ATTACK_SPEED_PERCENT = auto()
-    ABILITY_POWER = auto()
-    ABILITY_POWER_PERCENT = auto()
-    HEAL_AND_SHIELD_POWER = auto()
 
-    # _____Lifesteal and spell vamp___________
-    # Vamp and drain are distinct because drain benefits from heal power,
-    # while vamp does not
-    # Autoattacks:
-    AUTOATTACK_VAMP = auto()
-    AUTOATTACK_DRAIN = auto()
-    #Physical spell vamp:
-    PHYSICAL_TARGETED_CHAMPION_SPELL_VAMP = auto()
-    PHYSICAL_TARGETED_NONCHAMPION_SPELL_VAMP = auto()
-    PHYSICAL_AOE_CHAMPION_SPELL_VAMP = auto()
-    PHYSICAL_AOE_NONCHAMPION_SPELL_VAMP = auto()
-    PHYSICAL_ONHIT_VAMP = auto()
-    #Physical spell drain:
-    PHYSICAL_TARGETED_CHAMPION_DRAIN = auto()
-    PHYSICAL_TARGETED_NONCHAMPION_DRAIN = auto()
-    PHYSICAL_AOE_CHAMPION_DRAIN = auto()
-    PHYSICAL_AOE_NONCHAMPION_DRAIN = auto()
-    PHYSICAL_ONHIT_DRAIN = auto()
-    #Magical spell vamp:
-    MAGICAL_TARGETED_CHAMPION_SPELL_VAMP = auto()
-    MAGICAL_TARGETED_NONCHAMPION_SPELL_VAMP = auto()
-    MAGICAL_AOE_CHAMPION_SPELL_VAMP = auto()
-    MAGICAL_AOE_NONCHAMPION_SPELL_VAMP = auto()
-    MAGICAL_ONHIT_VAMP = auto()
-    #Magical spell drain:
-    MAGICAL_TARGETED_CHAMPION_SPELL_DRAIN = auto()
-    MAGICAL_TARGETED_NONCHAMPION_SPELL_DRAIN = auto()
-    MAGICAL_AOE_CHAMPION_SPELL_DRAIN = auto()
-    MAGICAL_AOE_NONCHAMPION_SPELL_DRAIN = auto()
-    MAGICAL_ONHIT_DRAIN = auto()
-    #True spell vamp:
-    TRUE_TARGETED_CHAMPION_SPELL_VAMP = auto()
-    TRUE_TARGETED_NONCHAMPION_SPELL_VAMP = auto()
-    TRUE_AOE_CHAMPION_SPELL_VAMP = auto()
-    TRUE_AOE_NONCHAMPION_SPELL_VAMP = auto()
-    TRUE_ONHIT_VAMP = auto()
-    #True spell drain:
-    TRUE_TARGETED_CHAMPION_SPELL_DRAIN = auto()
-    TRUE_TARGETED_NONCHAMPION_SPELL_DRAIN = auto()
-    TRUE_AOE_CHAMPION_SPELL_DRAIN = auto()
-    TRUE_AOE_NONCHAMPION_SPELL_DRAIN = auto()
-    TRUE_ONHIT_DRAIN = auto()
 
 class Damage():
     def __init__(self, type:DamageType, ratio:DamageRatio=DamageRatio.FLAT, amount:float=0, pen_armor_percent:List[float]=[], 
@@ -199,7 +124,7 @@ class AbstractMinion(abc.ABC):
     def take_damage(self, attack: Damage) -> None:
         pass
 class ChampStatusModifier:
-    def __init__(self, name:str, attribute_modifiers:Dict[ChampStatistic, int]):
+    def __init__(self, name:str, attribute_modifiers:Dict[ChampStatistic, int], condition):
         self.name = name
         self.attribute_modifiers = attribute_modifiers
 class Buff(ChampStatusModifier):
@@ -214,6 +139,8 @@ class onHitEffect():
         self.damageamount:float = damageamount
         self.damageRatio:DamageRatio = damageRatio
         self.debuff = debuff
+    def apply_effect(self, target):
+        target
 class Item:
     def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, int]], unique_passives:List[Tuple[str, Tuple[ChampStatistic, int]]], passive_effect:Buff):
         self.attribute_modifiers = attribute_modifiers
@@ -283,7 +210,7 @@ class Champion(AbstractMinion):
         self.exp: int = 0
         self.gold: int = 0
         self.shield = []
-        self.onHitEffects: [onHitEffect] = []
+        self.onHitEffects: List[onHitEffect] = []
     def get_maxhp(self) -> float:
         return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * self.hp_bonus_percent
     def get_maxmp(self) -> float:
