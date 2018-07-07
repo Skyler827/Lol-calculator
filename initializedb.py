@@ -15,8 +15,40 @@ def check_directory() -> None:
     d = os.path.join("data", latest_patch)
     if not os.path.exists(d):
         os.makedirs(d)
+def create_and_populate_table(table_name:str, columns:Dict[str,str], values:List[Dict[str, any]]) -> None:
+    """replaces a table in the database with a given table with new data
 
+    columns: key is the column name, value is the SQL data type along with other constraints
+    values: list of records, each with keys for the name of the column and a value for the data content
+    """
+    assert(set(columns.keys())==set(values[0].keys()))
+    conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
+    def clear_table():
+        c = conn.cursor()
+        c.execute(f"DROP TABLE IF EXISTS {table_name};")
+        c.close()
+        conn.commit()
+    def create_table():
+        c = conn.cursor()
+        sql = f"CREATE TABLE {table_name} ({','.join(' '+k+' '+columns[k] for k in columns.keys())})"
+        c.execute(sql)
+        c.close()
+        conn.commit()
+    def insert_data():
+        c = conn.cursor()
+        preamble = f"INSERT INTO {table_name}"
+        value_enumeration = "(" + ','.join(f":{k}" for k in columns.keys())+")"
+        sql = f"{preamble} VALUES {value_enumeration}"
+        print(sql)
+        c.executemany(sql, values)
+        c.close()
+        conn.commit()
+    clear_table()
+    create_table()
+    insert_data()
+    conn.close()
 def set_champs_table() -> None:
+    columns = {}
     text_attributes: List[str] = ["id", "name", "title", "blurb", "partype"]
     int_attributes: List[str] = ["key"]
     real_attributes: List[str] = [
@@ -24,44 +56,25 @@ def set_champs_table() -> None:
         "spellblockperlevel", "attackrange", "hpregen", "hpregenperlevel", "mpregen", "mpregenperlevel", 
         "crit", "critperlevel", "attackdamage","attackdamageperlevel", "attackspeedoffset","attackspeedperlevel"
     ]
-    def create_champs_table() -> None:
-        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
-        c = conn.cursor()
-        create_table_sql = "CREATE TABLE IF NOT EXISTS champions (" + \
-            ", ".join(x+" TEXT" for x in text_attributes) + ", " + \
-            ", ".join(x+" INTEGER" for x in int_attributes) + ", " + \
-            ", ".join(x+" REAL" for x in real_attributes) + ")"
-        try:
-            c.execute(create_table_sql)
-            c.close()
-            conn.commit()
-            conn.close()
-        except sqlite3.OperationalError:
-            c.execute("DROP TABLE champions;")
-            c.close()
-            conn.commit()
-            conn.close()
-            create_champs_table()
-    def enter_champ_data():
-        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
-        c = conn.cursor()
-        url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
-        if os.path.isfile(champion_json_filename): pass
-        else: urllib.request.urlretrieve(url, filename=champion_json_filename)
-        data: Dict = json.load(open(champion_json_filename))
-        for _, champ in data["data"].items():
-            sql_command = "INSERT OR REPLACE INTO champions (" + \
-                ",".join(text_attributes+int_attributes+real_attributes) + \
-                ") VALUES (" + ",".join(
-                    "?" for i in range(len(text_attributes)+len(int_attributes)+len(real_attributes)))+")"
-            c.execute(sql_command, [champ[x] for x in text_attributes+int_attributes] + [champ["stats"][x] for x in real_attributes])
-            #print(sql_command)
-            #print(champ["stats"])
-        c.close()
-        conn.commit()
-        conn.close()
-    create_champs_table()
-    enter_champ_data()
+    for x in text_attributes:
+        columns[x] = "TEXT"
+    for x in int_attributes:
+        columns[x] = "INTEGER"
+    for x in real_attributes:
+        columns[x] = "FLOAT"
+    url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
+    if os.path.isfile(champion_json_filename): pass
+    else: urllib.request.urlretrieve(url, filename=champion_json_filename)
+    data: Dict = json.load(open(champion_json_filename))['data']
+    values:List[Dict] = []
+    for champ in data.keys():
+        champ_obj = {}
+        for x in text_attributes + int_attributes:
+            champ_obj[x] = data[champ][x]
+        for x in real_attributes:
+            champ_obj[x] = data[champ]['stats'][x]
+        values.append(champ_obj)
+    create_and_populate_table("champions", columns, values)
 
 def set_statistics_table() -> None:
     def create_statistics_table() -> None:
