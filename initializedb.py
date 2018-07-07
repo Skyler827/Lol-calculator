@@ -7,9 +7,13 @@ import os.path
 from champ_statistics import ChampStatistic
 
 latest_patch: str = "8.13.1"
-db_name = os.path.join("data", "champdata.db")
-champion_json_filename = os.path.join("data", "champion.json")
+db_name = os.path.join("data", latest_patch, "champdata.db")
+champion_json_filename = os.path.join("data", latest_patch, "champion.json")
 
+def check_directory() -> None:
+    d = os.path.join("data", latest_patch)
+    if not os.path.exists(d):
+        os.makedirs(d)
 def set_champs_table() -> None:
     text_attributes: List[str] = ["id", "name", "title", "blurb", "partype"]
     int_attributes: List[str] = ["key"]
@@ -41,7 +45,7 @@ def set_champs_table() -> None:
         else: urllib.request.urlretrieve(url, filename=champion_json_filename)
         data: Dict = json.load(open(champion_json_filename))
         for _, champ in data["data"].items():
-            sql_command = "INSERT INTO champions (" + \
+            sql_command = "INSERT OR REPLACE INTO champions (" + \
                 ",".join(text_attributes+int_attributes+real_attributes) + \
                 ") VALUES (" + ",".join(
                     "?" for i in range(len(text_attributes)+len(int_attributes)+len(real_attributes)))+")"
@@ -72,28 +76,34 @@ def set_statistics_table() -> None:
         conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
         stat_names:List[str] = [[name] for name, _ in ChampStatistic.__members__.items()]
-        c.executemany("INSERT INTO statistics (name) VALUES (?)", stat_names)
+        c.executemany("INSERT OR REPLACE INTO statistics (name) VALUES (?)", stat_names)
         c.close()
         conn.commit()            
         conn.close()
     create_statistics_table()
     set_statistics_data()
-def create_item_table() -> None:
-    # Need to create 
-    conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
-    c = conn.cursor()
-    create_table_sql = "CREATE TABLE items ();"
-    try: c.execute(create_table_sql)
-    except sqlite3.OperationalError as e:
-        if str(e) == "table items already exists":
-            c.execute("DELETE FROM items;")
-            print("table champions already exists, passing")
-        else: raise e
-    c.close()
-    conn.commit()
-    conn.close()
+def set_item_table() -> None:
+    def create_item_table() -> None:
+        # Need to create 
+        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
+        c = conn.cursor()
+        create_table_sql = "CREATE TABLE items ();"
+        try: c.execute(create_table_sql)
+        except sqlite3.OperationalError as e:
+            if str(e) == "table items already exists":
+                c.execute("DELETE FROM items;")
+                print("table champions already exists, passing")
+            else: raise e
+        c.close()
+        conn.commit()
+        conn.close()
+    def set_item_data() -> None:
+        pass
+    create_item_table()
+    set_item_data()
 def main() -> None:
+    check_directory()
     set_champs_table()
     set_statistics_table()
-    
+    set_item_table()
 main()
