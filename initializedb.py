@@ -3,9 +3,12 @@ import os
 import urllib.request
 import json
 import sqlite3
+import os.path
 from champ_statistics import ChampStatistic
 
 latest_patch: str = "8.13.1"
+db_name = os.path.join("data", "champdata.db")
+champion_json_filename = os.path.join("data", "champion.json")
 
 def set_champs_table() -> None:
     text_attributes: List[str] = ["id", "name", "title", "blurb", "partype"]
@@ -16,7 +19,7 @@ def set_champs_table() -> None:
         "crit", "critperlevel", "attackdamage","attackdamageperlevel", "attackspeedoffset","attackspeedperlevel"
     ]
     def create_champs_table() -> None:
-        conn = sqlite3.connect('file:champdata.db?mode=rwc', uri=True)
+        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
         c = conn.cursor()
         create_table_sql = "CREATE TABLE champions (" + \
             ", ".join(x+" TEXT" for x in text_attributes) + ", " + \
@@ -31,13 +34,12 @@ def set_champs_table() -> None:
         conn.commit()
         conn.close()
     def enter_champ_data():
-        conn = sqlite3.connect('file:champdata.db?mode=rw', uri=True)
+        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
         url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
-        json_local_filename = 'champion.json'
-        if os.path.isfile(json_local_filename): pass
-        else: urllib.request.urlretrieve(url, filename=json_local_filename)
-        data: Dict = json.load(open(json_local_filename))
+        if os.path.isfile(champion_json_filename): pass
+        else: urllib.request.urlretrieve(url, filename=champion_json_filename)
+        data: Dict = json.load(open(champion_json_filename))
         for _, champ in data["data"].items():
             sql_command = "INSERT INTO champions (" + \
                 ",".join(text_attributes+int_attributes+real_attributes) + \
@@ -54,9 +56,9 @@ def set_champs_table() -> None:
 
 def set_statistics_table() -> None:
     def create_statistics_table() -> None:
-        conn = sqlite3.connect('file:champdata.db?mode=rwc', uri=True)
+        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
         c = conn.cursor()
-        create_table_sql = "CREATE TABLE statistics (name);"
+        create_table_sql = "CREATE TABLE statistics (name TEXT);"
         try:
             c.execute(create_table_sql)
         except sqlite3.OperationalError as e:
@@ -67,9 +69,9 @@ def set_statistics_table() -> None:
         conn.commit()            
         conn.close()
     def set_statistics_data() -> None:
-        conn = sqlite3.connect('file:champdata.db?mode=rw', uri=True)
+        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
-        stat_names = [name for name, _ in ChampStatistic.__members__.items()]
+        stat_names:List[str] = [[name] for name, _ in ChampStatistic.__members__.items()]
         c.executemany("INSERT INTO statistics (name) VALUES (?)", stat_names)
         c.close()
         conn.commit()            
@@ -78,7 +80,7 @@ def set_statistics_table() -> None:
     set_statistics_data()
 def create_item_table() -> None:
     # Need to create 
-    conn = sqlite3.connect('file:champdata.db?mode=rwc', uri=True)
+    conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
     c = conn.cursor()
     create_table_sql = "CREATE TABLE items ();"
     try: c.execute(create_table_sql)
