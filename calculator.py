@@ -1,6 +1,7 @@
 from typing import Dict, Tuple, List, IO
 from enum import Enum, auto
 import math
+import os.path
 import json
 import sqlite3
 import abc
@@ -8,6 +9,7 @@ from champ_statistics import ChampStatistic
 from damage_type import DamageType
 from damage_ratio import DamageRatio
 from resourcebar import ResourceBarType, resourcebar_from_text
+from initializedb import latest_patch, db_name
 
 class Damage():
     def __init__(self, type:DamageType, ratio:DamageRatio=DamageRatio.FLAT, amount:float=0, pen_armor_percent:List[float]=[], 
@@ -122,11 +124,13 @@ class Item:
         self.passive_effect = passive_effect
 class Champion(AbstractMinion):
     def __init__(self, name:str):
-        conn = sqlite3.connect("champdata.db")
+
+        conn = sqlite3.connect(db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         r:sqlite3.Row = c.execute("SELECT * FROM champions WHERE id=:name OR name=:name", {"name":name}).fetchone()
         # static quantities:
+        self.name = name
         self.hp_base = r["hp"]
         self.hp_perlevel = r["hpperlevel"]
         self.hp_bonus = 0
@@ -214,6 +218,7 @@ class Champion(AbstractMinion):
             damage = (attack.amount) * (100/(armor+100))
             damage *= (1-self.damagereduction_percent/100)
             self.hp -=  damage
+            print(f"{self.name} lost {damage} hp from an attack, and now has {self.hp} health!")
         elif attack.type == DamageType.MAGICAL:
             magic_resist = self.get_magic_resist()
             for i in attack.pen_magic_percent:

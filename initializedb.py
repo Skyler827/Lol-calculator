@@ -7,8 +7,9 @@ import os.path
 from champ_statistics import ChampStatistic
 
 latest_patch: str = "8.13.1"
-db_name = os.path.join("data", latest_patch, "champdata.db")
-champion_json_filename = os.path.join("data", latest_patch, "champion.json")
+db_name:str = os.path.join("data", latest_patch, "league_data.db")
+champion_json_filename:str = os.path.join("data", latest_patch, "champion.json")
+item_json_filename:str = os.path.join("data", latest_patch, "items.json")
 
 def check_directory() -> None:
     d = os.path.join("data", latest_patch)
@@ -98,7 +99,12 @@ def set_item_table() -> None:
         conn.commit()
         conn.close()
     def set_item_data() -> None:
-        pass
+        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
+        c = conn.cursor()
+        url: str = f"http://ddragon.leagueoflegends.com/cdn/{latest_patch}/data/en_US/item.json"
+        if not os.path.isfile(item_json_filename):
+            urllib.request.urlretrieve(url, filename=item_json_filename)
+
     create_item_table()
     set_item_data()
 def main() -> None:

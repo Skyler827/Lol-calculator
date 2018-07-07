@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-# statistics that can be modified by items, spell effects, buffs, or debuffs:
+# statistics that can be modified by items, spell effects, buffs, debuffs, or runes:
 class ChampStatistic(Enum):
     # Offensive, other than lifesteal/drain (see below):
     ATTACK_DAMAGE = auto()
@@ -24,14 +24,18 @@ class ChampStatistic(Enum):
 
     # Utility:
     COOLDOWN_REDUCTION = auto()
+    MAX_COOLDOWN_REDUCTION = auto()
     MANA = auto()
     MANA_REGEN = auto()
     MANA_REGEN_PERCENT = auto()
+    ENERGY_REGEN = auto()
+    ENERGY_REGEN_PERCENT = auto()
     HEAL_AND_SHIELD_POWER = auto()
     MOVE_SPEED_FLAT = auto()
     MOVE_SPEED_PERCENT = auto()
     ATTACK_RANGE = auto()
     ATTACK_RANGE_PERCENT = auto()
+    GOLD_GENERATION = auto()
 
     # Lifesteal and spell vamp
     ## (Vamp and drain are distinct because drain benefits from heal power,
