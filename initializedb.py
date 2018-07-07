@@ -15,6 +15,7 @@ def check_directory() -> None:
     d = os.path.join("data", latest_patch)
     if not os.path.exists(d):
         os.makedirs(d)
+
 def set_champs_table() -> None:
     text_attributes: List[str] = ["id", "name", "title", "blurb", "partype"]
     int_attributes: List[str] = ["key"]
@@ -26,18 +27,21 @@ def set_champs_table() -> None:
     def create_champs_table() -> None:
         conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
         c = conn.cursor()
-        create_table_sql = "CREATE TABLE champions (" + \
+        create_table_sql = "CREATE TABLE IF NOT EXISTS champions (" + \
             ", ".join(x+" TEXT" for x in text_attributes) + ", " + \
             ", ".join(x+" INTEGER" for x in int_attributes) + ", " + \
             ", ".join(x+" REAL" for x in real_attributes) + ")"
-        try: c.execute(create_table_sql)
-        except sqlite3.OperationalError as e:
-            if str(e) == "table champions already exists":
-                c.execute("DELETE FROM champions")
-            else: raise e
-        c.close()
-        conn.commit()
-        conn.close()
+        try:
+            c.execute(create_table_sql)
+            c.close()
+            conn.commit()
+            conn.close()
+        except sqlite3.OperationalError:
+            c.execute("DROP TABLE champions;")
+            c.close()
+            conn.commit()
+            conn.close()
+            create_champs_table()
     def enter_champ_data():
         conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
@@ -61,18 +65,20 @@ def set_champs_table() -> None:
 
 def set_statistics_table() -> None:
     def create_statistics_table() -> None:
-        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
+        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
-        create_table_sql = "CREATE TABLE statistics (name TEXT);"
+        create_table_sql = "CREATE TABLE IF NOT EXISTS statistics (name TEXT);"
         try:
             c.execute(create_table_sql)
-        except sqlite3.OperationalError as e:
-            if str(e) == "table statistics already exists":
-                c.execute("DELETE FROM statistics;")
-            else: raise e
-        c.close()
-        conn.commit()            
-        conn.close()
+            c.close()
+            conn.commit()            
+            conn.close()
+        except sqlite3.OperationalError:
+            c.execute("DROP TABLE IF EXISTS statistics;")
+            c.close()
+            conn.commit()            
+            conn.close()
+            create_statistics_table()
     def set_statistics_data() -> None:
         conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
@@ -88,23 +94,29 @@ def set_item_table() -> None:
         # Need to create 
         conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
         c = conn.cursor()
-        create_table_sql = "CREATE TABLE items ();"
-        try: c.execute(create_table_sql)
-        except sqlite3.OperationalError as e:
-            if str(e) == "table items already exists":
-                c.execute("DELETE FROM items;")
-                print("table champions already exists, passing")
-            else: raise e
-        c.close()
-        conn.commit()
-        conn.close()
+        create_table_sql = "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, name TEXT);"
+        try:
+            c.execute(create_table_sql)
+            c.close()
+            conn.commit()
+            conn.close()
+        except sqlite3.OperationalError:
+            c.execute("DROP TABLE items;")
+            c.close()
+            conn.commit()
+            conn.close()
+            create_item_table()
     def set_item_data() -> None:
         conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
         c = conn.cursor()
         url: str = f"http://ddragon.leagueoflegends.com/cdn/{latest_patch}/data/en_US/item.json"
         if not os.path.isfile(item_json_filename):
             urllib.request.urlretrieve(url, filename=item_json_filename)
-
+        data: Dict = json.load(open(item_json_filename))['data']
+        c.executemany("INSERT INTO items (id, name) VALUES (?, ?)", [[k, data[k]['name']] for k in data.keys()])
+        c.close()
+        conn.commit()
+        conn.close()
     create_item_table()
     set_item_data()
 def main() -> None:

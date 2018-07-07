@@ -5,4 +5,6 @@ item.json
 api_key.txt
 champdata.db
 file
+league_data.db
+items.json
 __pycache__
