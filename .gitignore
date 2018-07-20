@@ -1,5 +1,6 @@
 venv/
 .vscode/
+data/
 champion.json
 item.json
 api_key.txt

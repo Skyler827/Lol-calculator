@@ -12,7 +12,7 @@ champion_json_filename:str = os.path.join("data", latest_patch, "champion.json")
 item_json_filename:str = os.path.join("data", latest_patch, "items.json")
 
 def check_directory() -> None:
-    d = os.path.join("data", latest_patch)
+    d: str = os.path.join("data", latest_patch)
     if not os.path.exists(d):
         os.makedirs(d)
 def create_and_populate_table(table_name:str, columns:Dict[str,str], values:List[Dict[str, any]]) -> None:
@@ -39,7 +39,6 @@ def create_and_populate_table(table_name:str, columns:Dict[str,str], values:List
         preamble = f"INSERT INTO {table_name}"
         value_enumeration = "(" + ','.join(f":{k}" for k in columns.keys())+")"
         sql = f"{preamble} VALUES {value_enumeration}"
-        print(sql)
         c.executemany(sql, values)
         c.close()
         conn.commit()
@@ -65,7 +64,7 @@ def set_champs_table() -> None:
     url: str = 'http://ddragon.leagueoflegends.com/cdn/'+latest_patch+'/data/en_US/champion.json'
     if os.path.isfile(champion_json_filename): pass
     else: urllib.request.urlretrieve(url, filename=champion_json_filename)
-    data: Dict = json.load(open(champion_json_filename))['data']
+    data: Dict = json.load(open(champion_json_filename, errors="replace"))['data']
     values:List[Dict] = []
     for champ in data.keys():
         champ_obj = {}
@@ -75,66 +74,53 @@ def set_champs_table() -> None:
             champ_obj[x] = data[champ]['stats'][x]
         values.append(champ_obj)
     create_and_populate_table("champions", columns, values)
-
 def set_statistics_table() -> None:
-    def create_statistics_table() -> None:
-        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
-        c = conn.cursor()
-        create_table_sql = "CREATE TABLE IF NOT EXISTS statistics (name TEXT);"
-        try:
-            c.execute(create_table_sql)
-            c.close()
-            conn.commit()            
-            conn.close()
-        except sqlite3.OperationalError:
-            c.execute("DROP TABLE IF EXISTS statistics;")
-            c.close()
-            conn.commit()            
-            conn.close()
-            create_statistics_table()
-    def set_statistics_data() -> None:
-        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
-        c = conn.cursor()
-        stat_names:List[str] = [[name] for name, _ in ChampStatistic.__members__.items()]
-        c.executemany("INSERT OR REPLACE INTO statistics (name) VALUES (?)", stat_names)
-        c.close()
-        conn.commit()            
-        conn.close()
-    create_statistics_table()
-    set_statistics_data()
+    stat_names:List[str] = [name for name, _ in ChampStatistic.__members__.items()]
+    columns = {"name":"TEXT PRIMARY KEY"}
+    values:List[Dict[str, str]] = []
+    for i in stat_names:
+        values.append({"name": i})
+    create_and_populate_table("champ_statistics", columns, values)
+
 def set_item_table() -> None:
-    def create_item_table() -> None:
-        # Need to create 
-        conn = sqlite3.connect(f'file:{db_name}?mode=rwc', uri=True)
-        c = conn.cursor()
-        create_table_sql = "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, name TEXT);"
-        try:
-            c.execute(create_table_sql)
-            c.close()
-            conn.commit()
-            conn.close()
-        except sqlite3.OperationalError:
-            c.execute("DROP TABLE items;")
-            c.close()
-            conn.commit()
-            conn.close()
-            create_item_table()
-    def set_item_data() -> None:
-        conn = sqlite3.connect(f'file:{db_name}?mode=rw', uri=True)
-        c = conn.cursor()
-        url: str = f"http://ddragon.leagueoflegends.com/cdn/{latest_patch}/data/en_US/item.json"
-        if not os.path.isfile(item_json_filename):
-            urllib.request.urlretrieve(url, filename=item_json_filename)
-        data: Dict = json.load(open(item_json_filename))['data']
-        c.executemany("INSERT INTO items (id, name) VALUES (?, ?)", [[k, data[k]['name']] for k in data.keys()])
-        c.close()
-        conn.commit()
-        conn.close()
-    create_item_table()
-    set_item_data()
+    url: str = f"http://ddragon.leagueoflegends.com/cdn/{latest_patch}/data/en_US/item.json"
+    if not os.path.isfile(item_json_filename):
+        urllib.request.urlretrieve(url, filename=item_json_filename)
+    data: Dict = json.load(open(item_json_filename))['data']
+    columns = {
+        "id":"INTEGER PRIMARY KEY",
+        "name":"TEXT",
+        "plaintext":"TEXT",
+        "gold_base": "INTEGER",
+        "gold_total": "INTEGER",
+        "sell": "INTEGER"
+    }
+    values = []
+    for id in data.keys():
+        x = data[id]
+        values.append({
+            "id": id,
+            "name": x["name"],
+            "plaintext": x["plaintext"],
+            "gold_base": x["gold"]["base"],
+            "gold_total": x["gold"]["total"],
+            "sell" : x["gold"]["sell"]
+        })
+    create_and_populate_table("items", columns, values)
+def set_item_stats() -> None:
+    data: Dict = json.load(open(item_json_filename))['data']
+    columns = {
+        "item": "INTEGER REFERENCES items(id)",
+        "stat": "TEXT REFERENCES statistics(name)"
+    }
+    values = [];
+    for id in data.keys():
+        x = data[id]
+
 def main() -> None:
     check_directory()
     set_champs_table()
     set_statistics_table()
     set_item_table()
+    set_item_stats()
 main()

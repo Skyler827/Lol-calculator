@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import Union
 
 # statistics that can be modified by items, spell effects, buffs, debuffs, or runes:
 class ChampStatistic(Enum):
@@ -28,6 +29,7 @@ class ChampStatistic(Enum):
     MANA = auto()
     MANA_REGEN = auto()
     MANA_REGEN_PERCENT = auto()
+    MANA_REGEN_IN_JUNGLE = auto()
     ENERGY_REGEN = auto()
     ENERGY_REGEN_PERCENT = auto()
     HEAL_AND_SHIELD_POWER = auto()
@@ -79,3 +81,17 @@ class ChampStatistic(Enum):
     TRUE_AOE_CHAMPION_SPELL_DRAIN = auto()
     TRUE_AOE_NONCHAMPION_SPELL_DRAIN = auto()
     TRUE_ONHIT_DRAIN = auto()
+class Virtual_Champ_Statistic(Enum):
+    pass
+def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statistic]:
+    c = ChampStatistic
+
+    if s=="FlatMovementSpeedMod": return c.MOVE_SPEED_FLAT
+    elif s=="FlatHPPoolMod": return c.HP
+    elif s=="FlatMagicDamageMod": return c.ABILITY_POWER
+    elif s=="FlatMPPoolMod": return c.MANA
+    elif s=="FlatArmorMod": return c.ARMOR
+    elif s=="FlatSpellBlockMod": return c.MAGIC_RESIST
+    elif s=="FlatPhysicalDamageMod": return c.ATTACK_DAMAGE
+    elif s=="Effect4Amount": return c.MANA_REGEN_IN_JUNGLE
+    return c.ATTACK_DAMAGE
