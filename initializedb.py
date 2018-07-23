@@ -4,7 +4,7 @@ import urllib.request
 import json
 import sqlite3
 import os.path
-from champ_statistics import ChampStatistic
+from champ_statistics import ChampStatistic, get_stat_from_string
 
 latest_patch: str = "8.13.1"
 db_name:str = os.path.join("data", latest_patch, "league_data.db")
@@ -93,29 +93,49 @@ def set_item_table() -> None:
         "plaintext":"TEXT",
         "gold_base": "INTEGER",
         "gold_total": "INTEGER",
-        "sell": "INTEGER"
+        "sell": "INTEGER",
+        "component1": "INTEGER REFERENCES(items)",
+        "component2": "INTEGER REFERENCES(items)",
+        "component3": "INTEGER REFERENCES(items)",
+        "component4": "INTEGER REFERENCES(items)",
     }
     values = []
     for id in data.keys():
         x = data[id]
-        values.append({
+        obj = {
             "id": id,
             "name": x["name"],
             "plaintext": x["plaintext"],
             "gold_base": x["gold"]["base"],
             "gold_total": x["gold"]["total"],
             "sell" : x["gold"]["sell"]
-        })
+        }
+        try:
+            obj["component1"] = x["from"][0]
+            obj["component2"] = x["from"][1]
+            obj["component3"] = x["from"][2]
+            obj["component4"] = x["from"][3]
+        except: pass
+        values.append(obj)
     create_and_populate_table("items", columns, values)
 def set_item_stats() -> None:
     data: Dict = json.load(open(item_json_filename))['data']
     columns = {
         "item": "INTEGER REFERENCES items(id)",
-        "stat": "TEXT REFERENCES statistics(name)"
+        "stat": "TEXT REFERENCES statistics(name)",
+        "mod": "INTEGER"
     }
-    values = [];
+    values = []
     for id in data.keys():
         x = data[id]
+        offset = len("Champstatistic.")
+        for stat_name,stat_mod in x["stats"].items():
+            values.append({
+                "item":str(id),
+                "stat": str(get_stat_from_string(stat_name))[offset:],
+                "mod": stat_mod
+            })
+    create_and_populate_table("item_stats", columns, values)
 
 def main() -> None:
     check_directory()
@@ -123,4 +143,5 @@ def main() -> None:
     set_statistics_table()
     set_item_table()
     set_item_stats()
-main()
+if __name__ =="__main__":
+    main()
