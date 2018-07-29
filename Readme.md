@@ -5,23 +5,23 @@ League of Legends.  It's not working yet.
 
 ## Usage
 
-1. Clone this repository
+\1. Clone this repository
 
 `git clone https://gitlab.com/Skyler827/Lol-calculator`
-2. Create a python3 virtual environment
+\2. Create a python3 virtual environment
 
 `python3 -m venv venv`
-3. Activate the virtual environment
+\3. Activate the virtual environment
 
 Command for Mac and Linux:
 `source venv/bin/activate`
 Command for Windows: (coming soon!)
-4. Install required dependencies:
+\4. Install required dependencies:
 
 `pip install -r requirements.txt`
-5. Run `initializedb.py`
+\5. Run `initializedb.py`
 
-6. Run `python timer.py`
+\6. Run `python timer.py`
 
 ## Roadmap
 
