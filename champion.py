@@ -110,15 +110,16 @@ class Debuff(ChampStatusModifier):
     def __init__(self):
         super()
 class onHitEffect():
-    def __init__(self, type:DamageType, damageamount:float, damageRatio:DamageRatio, debuff:Debuff):
+    def __init__(self, type:DamageType, damageamount:float, damageRatio:DamageRatio, debuff:Debuff, origin:AbstractMinion):
         self.type:DamageType = type
         self.damageamount:float = damageamount
         self.damageRatio:DamageRatio = damageRatio
         self.debuff = debuff
+        self.origin = origin
     def apply_effect(self, target):
         target
 class Item:
-    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, int]], unique_passives:List[Tuple[str, Tuple[ChampStatistic, int]]], passive_effect:Buff):
+    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, float]], unique_passives:List[Tuple[str, Tuple[ChampStatistic, int]]], passive_effect:Buff):
         self.attribute_modifiers = attribute_modifiers
         self.unique_passives = unique_passives
         self.passive_effect = passive_effect
@@ -189,14 +190,32 @@ class Champion(AbstractMinion):
         self.gold: int = 0
         self.shield = []
         self.onHitEffects: List[onHitEffect] = []
+        conn.commit()
+        conn.close()
     def get_maxhp(self) -> float:
-        return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * self.hp_bonus_percent
+        return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * (1 + self.hp_bonus_percent)
     def get_maxmp(self) -> float:
         return self.mp_base + (self.level-1) * self.mp_perlevel
     def get_attackdamage(self) -> float:
         return self.attackdamage_base + (self.level-1) * self.attackdamage_perlevel
     def get_abilitypower(self) -> float:
         return self.abilitypower_flat * (1 + self.abilitypower_percent/100)
+    def get_attack_time(self) -> float:
+        atk_spd = ChampStatistic.ATTACK_SPEED_PERCENT
+        base_attack_speed = 0.625/(1+self.attackspeed_offset)
+        l = self.level
+        level_bonus = self.attackspeed_perlevel * ((7/400)*(l**2)+(267/400)*(l-1))
+        items_bonus = 0
+        for item in self.items:
+            for attribute in item.attribute_modifiers:
+                if attribute == atk_spd:
+                    items_bonus += attribute
+        buff_bonus = 0
+        for buff in self.buffs:
+            if atk_spd in buff.attribute_modifiers:
+                buff_bonus += buff.attribute_modifiers[atk_spd]
+        total_attack_speed = base_attack_speed * (1+level_bonus+items_bonus+buff_bonus)
+        return 1/total_attack_speed
     def gain_exp(self, exp_amount: int) -> None:
         assert(exp_amount > 0)
         self.exp += exp_amount
@@ -218,7 +237,6 @@ class Champion(AbstractMinion):
             damage = (attack.amount) * (100/(armor+100))
             damage *= (1-self.damagereduction_percent/100)
             self.hp -=  damage
-            print(f"{self.name} lost {damage} hp from an attack, and now has {self.hp} health!")
         elif attack.type == DamageType.MAGICAL:
             magic_resist = self.get_magic_resist()
             for i in attack.pen_magic_percent:
@@ -227,10 +245,8 @@ class Champion(AbstractMinion):
             damage = (attack.amount) * (100/magic_resist)
             damage *= (1-self.damagereduction_percent/100)
             self.hp -=  damage
-        elif attack.type == DamageType.TRUE:
-            self.hp -= (attack.amount) * (1-self.damagereduction_percent/100)
-        elif attack.type == DamageType.PURE:
-            self.hp -= (attack.amount)
+        elif attack.type in DamageType.TRUE or DamageType.PURE:
+            self.hp -= attack.amount
         else:
             raise Exception
         if self.hp <= 0:
@@ -256,9 +272,3 @@ class Champion(AbstractMinion):
         pass
     def die(self) -> None:
         pass
-
-
-def main():
-    c = Champion("Lulu")
-    c.take_damage(Damage(DamageType.PHYSICAL, amount=100))
-main()
