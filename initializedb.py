@@ -4,7 +4,8 @@ import urllib.request
 import json
 import sqlite3
 import os.path
-from champ_statistics import ChampStatistic, get_stat_from_string
+from mypy_extensions import TypedDict
+import champ_statistics as cs
 
 latest_patch: str = "8.13.1"
 db_name:str = os.path.join("data", latest_patch, "league_data.db")
@@ -30,7 +31,7 @@ def create_and_populate_table(table_name:str, columns:Dict[str,str], values:List
         conn.commit()
     def create_table():
         c = conn.cursor()
-        sql = f"CREATE TABLE {table_name} ({','.join(' '+k+' '+columns[k] for k in columns.keys())})"
+        sql = f"CREATE TABLE {table_name} ({', '.join(k+' '+columns[k] for k in columns.keys())})"
         c.execute(sql)
         c.close()
         conn.commit()
@@ -75,11 +76,17 @@ def set_champs_table() -> None:
         values.append(champ_obj)
     create_and_populate_table("champions", columns, values)
 def set_statistics_table() -> None:
-    stat_names:List[str] = [name for name, _ in ChampStatistic.__members__.items()]
-    columns = {"name":"TEXT PRIMARY KEY"}
-    values:List[Dict[str, str]] = []
-    for i in stat_names:
-        values.append({"name": i})
+    columns = {
+        "id": "INTEGER PRIMARY KEY",
+        "name":"TEXT"
+    }
+    values = TypedDict("champ_stats", {"id":int, "name":str})
+    values = []
+    for i in cs.ChampStatistic:
+        values.append({
+            "id": i.value,
+            "name": i.name
+        })
     create_and_populate_table("champ_statistics", columns, values)
 
 def set_item_table() -> None:
@@ -87,54 +94,83 @@ def set_item_table() -> None:
     if not os.path.isfile(item_json_filename):
         urllib.request.urlretrieve(url, filename=item_json_filename)
     data: Dict = json.load(open(item_json_filename))['data']
-    columns = {
+    columns:Dict[str, str] = {
         "id":"INTEGER PRIMARY KEY",
         "name":"TEXT",
         "plaintext":"TEXT",
         "gold_base": "INTEGER",
         "gold_total": "INTEGER",
-        "sell": "INTEGER",
-        "component1": "INTEGER REFERENCES(items)",
-        "component2": "INTEGER REFERENCES(items)",
-        "component3": "INTEGER REFERENCES(items)",
-        "component4": "INTEGER REFERENCES(items)",
+        "sell": "INTEGER"
     }
-    values = []
+    item_data = TypedDict("item_data", {
+        "id": int,
+        "name": str,
+        "plaintext": str,
+        "gold_base": int,
+        "gold_total": int,
+        "sell": int
+    })
+    values: List[item_data] = []
     for id in data.keys():
         x = data[id]
-        obj = {
-            "id": id,
+        obj: item_data = {
+            "id": int(id),
             "name": x["name"],
             "plaintext": x["plaintext"],
-            "gold_base": x["gold"]["base"],
-            "gold_total": x["gold"]["total"],
-            "sell" : x["gold"]["sell"]
+            "gold_base": int(x["gold"]["base"]),
+            "gold_total": int(x["gold"]["total"]),
+            "sell" : int(x["gold"]["sell"])
         }
-        try:
-            obj["component1"] = x["from"][0]
-            obj["component2"] = x["from"][1]
-            obj["component3"] = x["from"][2]
-            obj["component4"] = x["from"][3]
-        except: pass
         values.append(obj)
     create_and_populate_table("items", columns, values)
+def set_item_recipes() -> None:
+    pass
+    columns = {
+        "component_id": "INTEGER REFERENCES items(id)",
+        "product_id": "INTEGER REFERENCES items(id)"
+    }
+    url: str = f"http://ddragon.leagueoflegends.com/cdn/{latest_patch}/data/en_US/item.json"
+    if not os.path.isfile(item_json_filename):
+        urllib.request.urlretrieve(url, filename=item_json_filename)
+    data: Dict = json.load(open(item_json_filename))['data']
+    recipe_data = TypedDict("recipe_data", {"component_id": int, "product_id": int})
+    values:List[recipe_data] = []
+    for id in data:
+        try:
+            for product_id in data[id]["into"]:
+                curr_recipe: recipe_data = {
+                    "component_id": int(id),
+                    "product_id": int(product_id)
+                } 
+                values.append(curr_recipe)
+        except KeyError: pass
+    create_and_populate_table("recipes", columns, values)
 def set_item_stats() -> None:
     data: Dict = json.load(open(item_json_filename))['data']
-    columns = {
+    columns: Dict[str, str] = {
         "item": "INTEGER REFERENCES items(id)",
         "stat": "TEXT REFERENCES statistics(name)",
         "mod": "INTEGER"
     }
-    values = []
+    values: List[str,int] = []
     for id in data.keys():
         x = data[id]
-        offset = len("Champstatistic.")
-        for stat_name,stat_mod in x["stats"].items():
-            values.append({
-                "item":str(id),
-                "stat": str(get_stat_from_string(stat_name))[offset:],
-                "mod": stat_mod
-            })
+        for stat_name, stat_mod in x["stats"].items():
+            stat = cs.get_stat_from_string(stat_name)
+            if stat is cs.Virtual_Champ_Statistic:
+                actual_stats: Dict[cs.ChampStatistic, int] = cs.get_stat_from_virtual_stat(stat, stat_mod)
+                for each_stat in actual_stats:
+                    values.append({
+                        "item": int(id),
+                        "stat": each_stat.value,
+                        "mod": actual_stats[each_stat]
+                    })
+            else:
+                values.append({
+                    "item": int(id),
+                    "stat": stat.value,
+                    "mod": stat_mod
+                })
     create_and_populate_table("item_stats", columns, values)
 
 def main() -> None:
@@ -142,6 +178,7 @@ def main() -> None:
     set_champs_table()
     set_statistics_table()
     set_item_table()
+    set_item_recipes()
     set_item_stats()
 if __name__ =="__main__":
     main()

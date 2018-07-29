@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union
+from typing import Union, List, Dict
 
 # statistics that can be modified by items, spell effects, buffs, debuffs, or runes:
 class ChampStatistic(Enum):
@@ -83,13 +83,22 @@ class ChampStatistic(Enum):
     TRUE_AOE_CHAMPION_SPELL_DRAIN = auto()
     TRUE_AOE_NONCHAMPION_SPELL_DRAIN = auto()
     TRUE_ONHIT_DRAIN = auto()
+
+    UNRECOGNIZED_STAT = auto()
 class Virtual_Champ_Statistic(Enum):
     LIFE_STEAL = auto()
     pass
+def get_stat_from_virtual_stat(v: Virtual_Champ_Statistic, n: int) -> Dict[ChampStatistic, int]:
+    c = ChampStatistic
+    if v == c.LIFE_STEAL:
+        return {c.AUTOATTACK_CHAMPION_VAMP: n, c.AUTOATTACK_NONCHAMPION_VAMP: n}
+    else: 
+        return {}
 def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statistic]:
     c = ChampStatistic
+    v = Virtual_Champ_Statistic
 
-    if s=="": return c.ATTACK_DAMAGE
+    if s=="": return c.UNRECOGNIZED_STAT
     
     # # Offensive, other than lifesteal/drain (see below):
     # ATTACK_DAMAGE = auto()
@@ -113,9 +122,9 @@ def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statisti
     # HP_BONUS_PERCENT = auto()
     elif s=="PercentHPPoolMod": return c.HP_BONUS_PERCENT
     # HP_REGEN = auto()
-    elif s=="FlatHpRegenMod": return c.HP_REGEN
+    elif s=="FlatHPRegenMod": return c.HP_REGEN
     # HP_REGEN_PERCENT = auto()
-    elif s=="PercentHpRegenMod": return c.HP_REGEN_PERCENT
+    elif s=="PercentHPRegenMod": return c.HP_REGEN_PERCENT
     # ARMOR = auto()
     elif s=="FlatArmorMod": return c.ARMOR
     # ARMOR_PERCENT = auto()
@@ -146,6 +155,7 @@ def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statisti
     # MOVE_SPEED_FLAT = auto()
     elif s=="FlatMovementSpeedMod": return c.MOVE_SPEED_FLAT
     # MOVE_SPEED_PERCENT = auto()
+    elif s=="PercentMovementSpeedMod": return c.MOVE_SPEED_PERCENT
     # ATTACK_RANGE = auto()
     # ATTACK_RANGE_PERCENT = auto()
     # GOLD_GENERATION = auto()
@@ -156,6 +166,7 @@ def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statisti
     # # Autoattacks:
     # AUTOATTACK_VAMP = auto()
     # AUTOATTACK_DRAIN = auto()
+    elif s=="PercentLifeStealMod": return v.LIFE_STEAL
     # #Physical spell vamp:
     # PHYSICAL_TARGETED_CHAMPION_SPELL_VAMP = auto()
     # PHYSICAL_TARGETED_NONCHAMPION_SPELL_VAMP = auto()
@@ -192,4 +203,6 @@ def get_stat_from_string(s: str) -> Union[ChampStatistic, Virtual_Champ_Statisti
     # TRUE_AOE_CHAMPION_SPELL_DRAIN = auto()
     # TRUE_AOE_NONCHAMPION_SPELL_DRAIN = auto()
     # TRUE_ONHIT_DRAIN = auto()
-    else: return c.ATTACK_DAMAGE
+    else:
+        print(f"unrecognized stat: {s}")
+        return c.UNRECOGNIZED_STAT
