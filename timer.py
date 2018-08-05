@@ -1,6 +1,6 @@
 import champion as c
 
-def get_status(blue_champ, red_champ, time_elapsed):
+def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float):
     return {
         "time_passed": time_elapsed,
         "blue_champ_hp":blue_champ.hp,
@@ -12,10 +12,10 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
     red_champ_must_wait = 0
     blue_champ_must_wait = 0
     time_elapsed = 0
+    initial_status = get_status(blue_side_champ, red_side_champ, time_elapsed)
     events = []
     while (blue_side_champ.hp > 0 and red_side_champ.hp > 0):
         this_event = {}
-        this_event["old_status"] = get_status(blue_side_champ, red_side_champ, time_elapsed)
         if red_champ_must_wait < blue_champ_must_wait:
             # Time passes, then Red attacks Blue
             time_passes = red_champ_must_wait
@@ -44,6 +44,7 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
             blue_champ_must_wait = 0
             time_elapsed += blue_champ_must_wait
         else: raise Exception
+        this_event["new_status"] = get_status(blue_side_champ, red_side_champ, time_elapsed)
         events.append(this_event)
     winner = None
     if red_side_champ.hp > 0:
@@ -53,14 +54,19 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
     elif blue_side_champ.hp == red_side_champ.hp == 0:
         pass
     return {
+        "blue_champ":blue_champion_name,
+        "red_champ": red_champion_name,
+        "initial": initial_status,
         "events": events,
         "winner": winner.name if winner else "draw",
         "winner_hp": winner.hp if winner else 0
     }
 def main():
-    x = run_combat("Shyvana", "Darius")
+    x = run_combat("Ahri", "Veigar")
+    print(f"It's {x['blue_champ']} on blue vs {x['red_champ']} on red.")
+    x[""]
     for i in x["events"]:
         print(i)
-    print(x["winner"])
+    print(x["winner"] + " wins!")
 if __name__ == "__main__":
     main()
