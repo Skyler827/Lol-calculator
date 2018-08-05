@@ -227,6 +227,7 @@ class Champion(AbstractMinion):
         hp_percent = self.hp / self.get_maxhp()
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
+    
     def take_damage(self, attack: Damage) -> None:
         if attack.type == DamageType.PHYSICAL:
             armor = self.get_armor()
@@ -237,6 +238,9 @@ class Champion(AbstractMinion):
             damage = (attack.amount) * (100/(armor+100))
             damage *= (1-self.damagereduction_percent/100)
             self.hp -=  damage
+            if self.hp <= 0:
+                self.die()
+            return damage
         elif attack.type == DamageType.MAGICAL:
             magic_resist = self.get_magic_resist()
             for i in attack.pen_magic_percent:
@@ -245,12 +249,14 @@ class Champion(AbstractMinion):
             damage = (attack.amount) * (100/magic_resist)
             damage *= (1-self.damagereduction_percent/100)
             self.hp -=  damage
+            if self.hp <= 0:
+                self.die()
+            return damage
         elif attack.type in DamageType.TRUE or DamageType.PURE:
             self.hp -= attack.amount
+            return damage
         else:
             raise Exception
-        if self.hp <= 0:
-            self.die()
     def basic_attack(self, target: AbstractMinion) -> None:
         attack = Damage(DamageType.PHYSICAL, amount=self.get_attackdamage(), \
             pen_armor_percent=self.pen_armor_percent, pen_lethality=self.pen_lethality)
@@ -258,10 +264,6 @@ class Champion(AbstractMinion):
         for effect in self.onHitEffects:
             target.take_damage(effect.getDamage(effect, target))
 
-    def buy_item(self, item):
-        pass
-    def sell_item(self, item):
-        pass
     def Spell1(self, target):
         pass
     def Spell2(self, target):
