@@ -50,12 +50,12 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
         winner = red_side_champ
     elif blue_side_champ.hp > 0:
         winner = blue_side_champ
-    else:
+    elif blue_side_champ.hp == red_side_champ.hp == 0:
         pass
     return {
         "events": events,
-        "winner": winner.name,
-        "winner_hp":winner.hp
+        "winner": winner.name if winner else "draw",
+        "winner_hp": winner.hp if winner else 0
     }
 def main():
     x = run_combat("Shyvana", "Darius")
