@@ -97,7 +97,7 @@ class AbstractMinion(abc.ABC):
         x *= (1 - self.spellblock_reduction_percent)
         return x
     @abc.abstractmethod
-    def take_damage(self, attack: Damage) -> None:
+    def take_damage(self, attack: Damage) -> float:
         pass
 class ChampStatusModifier:
     def __init__(self, name:str, attribute_modifiers:Dict[ChampStatistic, int], condition):
@@ -228,7 +228,7 @@ class Champion(AbstractMinion):
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
     
-    def take_damage(self, attack: Damage) -> None:
+    def take_damage(self, attack: Damage) -> float:
         if attack.type == DamageType.PHYSICAL:
             armor = self.get_armor()
             # Armor penetration stacks multiplicatively, so we combine with a loop:
@@ -257,13 +257,14 @@ class Champion(AbstractMinion):
             return damage
         else:
             raise Exception
-    def basic_attack(self, target: AbstractMinion) -> None:
+    def basic_attack(self, target: AbstractMinion) -> float:
+        damage_done = 0
         attack = Damage(DamageType.PHYSICAL, amount=self.get_attackdamage(), \
             pen_armor_percent=self.pen_armor_percent, pen_lethality=self.pen_lethality)
-        target.take_damage(attack)
+        damage_done += target.take_damage(attack)
         for effect in self.onHitEffects:
-            target.take_damage(effect.getDamage(effect, target))
-
+            damage_done += target.take_damage(effect.getDamage(effect, target))
+        return damage_done
     def Spell1(self, target):
         pass
     def Spell2(self, target):

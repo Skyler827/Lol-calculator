@@ -10,7 +10,7 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
     time_elapsed = 0
     
     initial = {
-        
+
     }
     events = []
     
@@ -22,8 +22,8 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
             red_champ_must_wait = 0
             blue_champ_must_wait -= time_passes
             time_elapsed += time_passes
-            print(f"{red_side_champ.name} attacks!")
-            red_side_champ.basic_attack(blue_side_champ)
+            damage_done = red_side_champ.basic_attack(blue_side_champ)
+            print(f"{red_side_champ.name} attacks, dealing {damage_done} damage!")
             red_champ_must_wait += red_side_champ.get_attack_time()
 
         elif blue_champ_must_wait < red_champ_must_wait:
@@ -32,16 +32,16 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
             blue_champ_must_wait = 0
             red_champ_must_wait -= time_passes
             time_elapsed += time_passes
-            print(f"{blue_side_champ.name} Attacks!")
-            blue_side_champ.basic_attack(red_side_champ)
+            damage_done = blue_side_champ.basic_attack(red_side_champ)
+            print(f"{blue_side_champ.name} Attacks, dealing {damage_done} damage!")
             blue_champ_must_wait += blue_side_champ.get_attack_time()
         elif blue_champ_must_wait == red_champ_must_wait == 0:
             #Both may attack, no time passes
-            print(f"{red_side_champ.name} Attacks!")
-            red_side_champ.basic_attack(blue_side_champ)
+            damage_on_blue = red_side_champ.basic_attack(blue_side_champ)
+            print(f"{red_side_champ.name} Attack, dealing {damage_on_blue} damage!")
             red_champ_must_wait += red_side_champ.get_attack_time()
-            print(f"{blue_side_champ.name} Attacks!")
-            blue_side_champ.basic_attack(red_side_champ)
+            damage_on_red = blue_side_champ.basic_attack(red_side_champ)
+            print(f"{blue_side_champ.name} Attacks, dealing {damage_on_red} damage!")
             blue_champ_must_wait += blue_side_champ.get_attack_time()
         elif blue_champ_must_wait == red_champ_must_wait > 0:
             red_champ_must_wait = 0
@@ -49,9 +49,9 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
             time_elapsed += blue_champ_must_wait
         else: raise Exception
     if red_side_champ.hp > 0:
-        print(f"Master Yi won, with {red_side_champ.hp} HP to spare")
+        print(f"{red_side_champ.name} wins, with {red_side_champ.hp} HP to spare")
     elif blue_side_champ.hp > 0:
-        print(f"Leona won, with {blue_side_champ.hp} HP to spare")
+        print(f"{blue_side_champ.name} wins, with {blue_side_champ.hp} HP to spare")
     else:
         print("both of their HP went to 0 at the same time")
     return {
@@ -60,4 +60,7 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
         "winner": blue_side_champ.name,
         "winner_hp":blue_side_champ.hp
     }
-run_combat("Leona", "Master Yi")
+def main():
+    run_combat("Sona", "Lulu")
+if __name__ == "__main__":
+    main()
