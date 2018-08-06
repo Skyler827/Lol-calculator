@@ -1,0 +1,12 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    outline: 1px solid red;
+}
+body {
+    background-color: lightgray;
+}
+.container {
+    width: 1000px;
+    margin: 0 auto;
+}
