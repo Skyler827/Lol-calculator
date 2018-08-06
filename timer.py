@@ -64,7 +64,7 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
 def main():
     x = run_combat("Ahri", "Veigar")
     print(f"It's {x['blue_champ']} on blue vs {x['red_champ']} on red.")
-    x[""]
+    print(x["initial"])
     for i in x["events"]:
         print(i)
     print(x["winner"] + " wins!")
