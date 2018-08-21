@@ -9,3 +9,4 @@ file
 league_data.db
 items.json
 __pycache__
+db.sqlite3

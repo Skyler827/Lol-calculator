@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'calc/style.css' %}">
     </head>
     <body>
         <h1>title</h1>
