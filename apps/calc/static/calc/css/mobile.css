@@ -1,0 +1,30 @@
+/* MOBILE STYLES */
+@media screen and (max-width: 800px) {
+    div.widescreen.container, div.medium.container {
+        display: none;
+    }
+    .usage-note {
+        text-align: center;
+    }
+}
+@media screen and (max-width: 450px) {
+    .item, img.summoner-spell {
+        width: 32px;
+        height: 32px;
+    }
+    .title-n-summs {
+        grid-template-columns: auto 38px 38px;
+    }
+    .title-n-summs p {
+        display: none;
+    }
+    .title-n-summs {
+        display: grid;
+        grid-template-columns: auto 38px;
+    }
+    .title-n-summs img {
+        justify-self: end;
+    
+    }
+
+}

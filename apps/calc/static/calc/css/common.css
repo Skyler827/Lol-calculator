@@ -1,0 +1,55 @@
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+/* COMMON STYLES */
+body {
+    background-color: #222;
+    color: white;
+}
+.champ-div {
+    padding: 10px;
+    margin: 15px;
+    border: 4px groove yellow;
+}
+.champ-div .blue {
+    background-color: #226;
+}
+.champ-div .red {
+    background-color: #622;
+}
+h1, h2, .usage-note {
+    text-align: center;
+}
+.items {
+    background-color: #333;
+}
+div.champ-div {
+    display: grid;
+    grid-template-columns: 180px auto;
+}
+.inner-champ-div p {
+    margin: 0;
+}
+img.champ-icon {
+    width: 100%;
+    max-width: 192px;
+}
+.champ-details {
+    padding: 6px;
+}
+.title-n-summs {
+    display: grid;
+    grid-template-columns: auto 72px 72px;
+}
+.items {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.item {
+    justify-self: center;
+    margin: 4px;
+}

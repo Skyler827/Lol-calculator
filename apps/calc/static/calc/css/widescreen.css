@@ -1,0 +1,9 @@
+/* WIDESCREEN STYLES */
+@media screen and (min-width: 1550px) {
+    div.mobile.container, div.medium.container {
+        display: none;
+    }
+    h1 {
+        text-align: justify-all;
+    }
+}

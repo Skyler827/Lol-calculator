@@ -1,0 +1,39 @@
+/* MEDIUM STYLES */
+@media screen and (min-width: 800px) and (max-width: 1550px) {
+    div.widescreen.container {
+        display: none;
+    }
+    span.mobile-note, .usage-note {
+        display: none;
+    }
+    div.champ-divs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    div.champ-div {}
+}
+@media screen and (min-width:800px) and (max-width: 1100px){
+    div.champ-div {
+        display: grid;
+        grid-template-columns: 120px auto;
+    }
+    
+    .item, img.summoner-spell {
+        width: 32px;
+        height: 32px;
+    }
+    .title-n-summs {
+        grid-template-columns: auto 38px 38px;
+    }
+    .title-n-summs p {
+        display: none;
+    }
+    .title-n-summs {
+        display: grid;
+        grid-template-columns: auto 38px;
+    }
+    .title-n-summs img {
+        justify-self: end;
+    
+    }
+}
