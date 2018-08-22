@@ -1,16 +1,16 @@
 /* COMMON STYLES */
 html {
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
 }
 *, *:before, *:after {
-    box-sizing: inherit;
+    /* box-sizing: inherit; */
 }
 body {
     background-color: #222;
-    color: white;
 }
 .container {
     padding-top: 15px;
+    color: white;
 }
 h1, h2 {
     margin: 20px;
@@ -31,12 +31,26 @@ h1, h2 {
 h1, h2, .usage-note {
     text-align: center;
 }
+.clickable-image-container {
+    position: relative;
+    display: block;
+}
+.clickable-image-container .middle{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.clickable-image-container .upper {
+    position: absolute;
+}
 .items {
     background-color: #333;
 }
 div.champ-div {
     display: grid;
     grid-template-columns: 180px auto;
+    grid-gap: 5px;
 }
 .inner-champ-div p {
     margin: 0;
@@ -59,10 +73,9 @@ p.items-summs {
     display: grid;
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
-    margin: 0 auto;
+    justify-content: center;
 }
 .item {
-    justify-self: center;
     margin: 4px;
 }
 .graph-div {
@@ -72,4 +85,37 @@ p.items-summs {
 .runes-container {
     margin: 5px;
     outline: 2px solid black;
+}
+.runes-container {
+}
+.runes-primary-tree, .runes-secondary-tree {
+    display: inline-block;
+    vertical-align: top;
+}
+.secondary-tree-icon, .keystone-rune {
+    text-align: center;
+    margin: 25px;
+}
+.keystone-rune span {
+    font-size: 20px;
+    border: 20px solid #222;
+    border-radius: 100%;
+    background-color: #222;
+}
+.secondary-tree-icon span {
+    border: 15px solid #222;
+    border-radius: 100%;
+    background-color: #222;
+
+}
+.lesser-runes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.lesser-rune {
+    margin: 5px;
+    border: 10px solid black;
+    border-radius: 100%;
+    background-color: black;
+    text-align: center;
 }

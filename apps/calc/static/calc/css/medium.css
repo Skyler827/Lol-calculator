@@ -13,7 +13,8 @@
         grid-column: span 2;
     }
     .items {
-        width: 260px;
+        margin: 0 auto;
+        width: 250px;
     }
 }
 /* only for smaller medium screens: */
@@ -23,12 +24,12 @@
         grid-template-columns: 120px auto;
     }
     .items {
-        width: 180px;
+        margin: 0 auto;
+        width: 125px;
     }
-    
     .item, img.summoner-spell {
-        width: 48px;
-        height: 48px;
+        width: 32px;
+        height: 32px;
     }
     .title-n-summs {
         grid-template-columns: auto 38px 38px;

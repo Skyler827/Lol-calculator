@@ -6,10 +6,17 @@
     <title>League of Legends Combat Simulator</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/normalize.css' %}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>    
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/common.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/mobile.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/medium.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/widescreen.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'calc/css/modals-common.css' %}">
+    <script src="{% static 'calc/js/champ_select.js' %}"></script>
+    <script src="{% static 'calc/js/summoner_select.js' %}"></script>
+
 </head>
 <body>
     <div class="container">
@@ -20,8 +27,11 @@
             <div class="champ-div blue-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
-                    <img class="champ-icon" src="{% static 'calc/img/champ_square/Ashe.png' %}">
-                    <p>Ashe</p>
+                    <a class="clickable-image-container" href="#blue-champ-select" rel="modal:open">
+                        <img class="champ-icon" src="{% static 'calc/img/champ_square/black_square.png' %}">
+                        <div class="middle">Select a champion</div>
+                    </a>
+                    <p class="champ-name">[None selected]</p>
                 </div>
                 <div class="champ-details blue">
                     <div class="title-n-summs">
@@ -38,21 +48,49 @@
                         <img class="item" src="{% static 'calc/img/items/3046.png' %}">
                     </div>
                     <div class="runes-container">
-                        <div class="keystone-rune">Keystone rune</div>
-                        <div class="lesser-runes">
-                            <div class="rune-row">rune</div>
-                            <div class="rune-row">rune</div>
-                            <div class="rune-row">rune</div>
+                        <div class="runes-primary-tree">
+                            <div class="keystone-rune"><span>KS</span></div>
+                            <div class="lesser-runes">
+                                <div class="lesser-rune">r1</div>
+                                <div class="lesser-rune">r2</div>
+                                <div class="lesser-rune">r3</div>
+                                <div class="lesser-rune">r4</div>
+                                <div class="lesser-rune">r5</div>
+                                <div class="lesser-rune">r6</div>
+                                <div class="lesser-rune">r7</div>
+                                <div class="lesser-rune">r8</div>
+                                <div class="lesser-rune">r9</div>
+                            </div>
+    
                         </div>
-                    </div>
+                        <div class="runes-secondary-tree">
+                            <div class="secondary-tree-icon"><span>T2</span></div>
+                            <div class="lesser-runes">
+                                <div class="lesser-rune">r1</div>
+                                <div class="lesser-rune">r2</div>
+                                <div class="lesser-rune">r3</div>
+                                <div class="lesser-rune">r4</div>
+                                <div class="lesser-rune">r5</div>
+                                <div class="lesser-rune">r6</div>
+                                <div class="lesser-rune">r7</div>
+                                <div class="lesser-rune">r8</div>
+                                <div class="lesser-rune">r9</div>
+                            </div>
+    
+        
+                        </div>
+                    </div>                    
                 </div>
             </div>
             <div class="champ-div red-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
-                    <img class="champ-icon" src="{% static 'calc/img/champ_square/Lulu.png' %}">
-                    <p>Lulu</p>
-                </div>
+                    <a class="clickable-image-container" href="#blue-champ-select" rel="modal:open">
+                        <img class="champ-icon" src="{% static 'calc/img/champ_square/black_square.png' %}">
+                        <div class="middle">Select a champion</div>
+                    </a>
+                    <p class="champ-name">[None selected]</p>
+                    </div>
                 <div class="champ-details red">
                     <div class="title-n-summs">
                         <p class="items-summs">Items\Summoners:</p>
@@ -69,45 +107,33 @@
                     </div>
                     <div class="runes-container">
                         <div class="runes-primary-tree">
-                            <div class="keystone-rune">KS</div>
+                            <div class="keystone-rune"><span>KS</span></div>
                             <div class="lesser-runes">
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
+                                <div class="lesser-rune">r1</div>
+                                <div class="lesser-rune">r2</div>
+                                <div class="lesser-rune">r3</div>
+                                <div class="lesser-rune">r4</div>
+                                <div class="lesser-rune">r5</div>
+                                <div class="lesser-rune">r6</div>
+                                <div class="lesser-rune">r7</div>
+                                <div class="lesser-rune">r8</div>
+                                <div class="lesser-rune">r9</div>
                             </div>
                         </div>
                         <div class="runes-secondary-tree">
-                            <div class="secondary-tree-icon">T2</div>
+                            <div class="secondary-tree-icon"><span>T2</span></div>
                             <div class="lesser-runes">
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
-                                <div class="rune-row">
-                                    <div class="lesser-rune">r1</div>
-                                    <div class="lesser-rune">r2</div>
-                                    <div class="lesser-rune">r3</div>
-                                </div>
+                                <div class="lesser-rune">r1</div>
+                                <div class="lesser-rune">r2</div>
+                                <div class="lesser-rune">r3</div>
+                                <div class="lesser-rune">r4</div>
+                                <div class="lesser-rune">r5</div>
+                                <div class="lesser-rune">r6</div>
+                                <div class="lesser-rune">r7</div>
+                                <div class="lesser-rune">r8</div>
+                                <div class="lesser-rune">r9</div>
                             </div>
-    
+        
                         </div>
                     </div>
 
@@ -117,6 +143,40 @@
                 <p>Graph div</p>
             </div>
         </div>
+    </div>
+    <div id="blue-champ-select" class="champ-select-modal">
+        <p>Select a champion:</p>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Lulu.png' %}">
+            <p><a href="#!" rel="modal:close">Lulu<span></span></a></p>
+        </div>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Ashe.png' %}">
+            <p><a href="#!" rel="modal:close">Ashe<span></span></a></p>
+        </div>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Taric.png' %}">
+            <p><a href="#!" rel="modal:close">Taric<span></span></a></p>
+        </div>
+        <div></div>
+        <a class="close-link" href="#" rel="modal:close">Close</a>
+    </div>
+    <div id="red-champ-select" class="champ-select-modal">
+        <p>Select a champion:</p>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Lulu.png' %}">
+            <p><a href="#!" rel="modal:close">Lulu<span></span></a></p>
+        </div>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Ashe.png' %}">
+            <p><a href="#!" rel="modal:close">Ashe<span></span></a></p>
+        </div>
+        <div class="selectable-champ">
+            <img src="{% static 'calc/img/champ_square/Taric.png' %}">
+            <p><a href="#!" rel="modal:close">Taric<span></span></a></p>
+        </div>
+        <div></div>
+        <a class="close-link" href="#" rel="modal:close">Close</a>
     </div>
 </body>
 </html>

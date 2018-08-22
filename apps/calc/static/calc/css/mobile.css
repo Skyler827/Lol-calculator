@@ -11,7 +11,8 @@
         grid-template-columns: 1fr 2fr;
     }
     .items {
-        width: 260px;
+        width: 250px;
+        margin: 0 auto;
     }
         
 }
@@ -21,9 +22,10 @@
         grid-template-columns: 120px auto;
     }
     .items {
-        width: 130px;
+        width: 125px;
+        margin: 0 auto;
     }
-    
+
     .item, img.summoner-spell {
         width: 32px;
         height: 32px;

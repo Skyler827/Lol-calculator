@@ -9,7 +9,6 @@
     div.component-container {
         display: grid;
         grid-template-columns: 500px auto 500px;
-        /* grid-template-rows: 400px 400px 400px; */
     }
     .champ-div.blue-champ {
         grid-row:1;
@@ -19,5 +18,45 @@
         grid-row: 1;
         grid-column: 3;
     }
+
+}
+/* smaller widescreen */
+@media screen and (min-width: 1550px) and (max-width: 1700px) {
+    div.component-container {
+        display: grid;
+        grid-template-columns: 450px auto 450px;
+    }
+
+    img.summoner-spell, img.item {
+        width: 32px;
+        height: 32px;
+    }
+    .title-n-summs {
+        grid-template-columns: auto 38px 38px;
+        grid-gap: 10px;
+    }
+    .title-n-summs {
+        display: grid;
+        grid-template-columns: auto 38px;
+    }
+    .items {
+        margin: 0 auto;
+        width: 130px;
+    }
+
+}
+/* larger widescreens */
+@media screen and (min-width: 1700px) {
+    .runes-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .lesser-rune {
+        margin: 6px;
+        border: 6px solid black;
+        border-radius: 100%;
+        font-size: 0.75rem;
+    }
+
 
 }
