@@ -1,13 +1,29 @@
 /* MOBILE STYLES */
+/* All mobile phones */
 @media screen and (max-width: 800px) {
-    div.widescreen.container, div.medium.container {
-        display: none;
+    h1, h2 {
+        display: block;
     }
     .usage-note {
         text-align: center;
     }
+    div.champ-div {
+        grid-template-columns: 1fr 2fr;
+    }
+    .items {
+        width: 260px;
+    }
+        
 }
-@media screen and (max-width: 450px) {
+/* smaller mobile phones */
+@media screen and (max-width: 550px) {
+    div.champ-div {
+        grid-template-columns: 120px auto;
+    }
+    .items {
+        width: 130px;
+    }
+    
     .item, img.summoner-spell {
         width: 32px;
         height: 32px;
@@ -25,6 +41,13 @@
     .title-n-summs img {
         justify-self: end;
     
+    }
+
+}
+/* REALLY SMALL mobile phones */
+@media screen and (max-width: 300px) {
+    div.champ-div {
+        grid-template-columns: 90px auto;
     }
 
 }

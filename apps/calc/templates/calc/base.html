@@ -12,12 +12,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/widescreen.css' %}">
 </head>
 <body>
-    <div class="mobile container">
+    <div class="container">
         <h1>League of Legends</h1>
-        <h2>Combat Simulator <span class="mobile-note">(mobile)</span></h2>
+        <h2>Combat Simulator <span class="only-mobile">(mobile)</span></h2>
         <p class="usage-note">(Click or tap a champ/item/rune to change it)</p>
-        <div class="champ-divs">    
-            <div class="champ-div">
+        <div class="component-container">
+            <div class="champ-div blue-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
                     <img class="champ-icon" src="{% static 'calc/img/champ_square/Ashe.png' %}">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="champ-details blue">
                     <div class="title-n-summs">
-                        <p>Items\Summoners:</p>
+                        <p class="items-summs">Items\Summoners:</p>
                         <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerFlash.png' %}">
                         <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerHeal.png' %}">                
                     </div>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
             </div>
-            <div class="champ-div">
+            <div class="champ-div red-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
                     <img class="champ-icon" src="{% static 'calc/img/champ_square/Lulu.png' %}">
@@ -55,7 +55,7 @@
                 </div>
                 <div class="champ-details red">
                     <div class="title-n-summs">
-                        <p>Items\Summoners:</p>
+                        <p class="items-summs">Items\Summoners:</p>
                         <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerFlash.png' %}">
                         <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerExhaust.png' %}">                
                     </div>
@@ -67,25 +67,55 @@
                         <img class="item" src="{% static 'calc/img/items/3174.png' %}">
                         <img class="item" src="{% static 'calc/img/items/3158.png' %}">
                     </div>
+                    <div class="runes-container">
+                        <div class="runes-primary-tree">
+                            <div class="keystone-rune">KS</div>
+                            <div class="lesser-runes">
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="runes-secondary-tree">
+                            <div class="secondary-tree-icon">T2</div>
+                            <div class="lesser-runes">
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                                <div class="rune-row">
+                                    <div class="lesser-rune">r1</div>
+                                    <div class="lesser-rune">r2</div>
+                                    <div class="lesser-rune">r3</div>
+                                </div>
+                            </div>
+    
+                        </div>
+                    </div>
+
                 </div>
-
             </div>
-        </div>
-        <div class="graph-div">
-            <p>Graph div</p>
-        </div>
-    </div>
-
-    <div class="widescreen container">
-        <h1>League of Legends Combat Simulator (widescreen)</h1>
-        <div class="champ-div">
-            <div class="champ-picture">Blue Champ Image</div>
-            <p>Blue champ title</p>
-        </div>
-        <div class="graph-div"></div>
-        <div class="champ-div">
-            <div class="champ-picture">Red champ Image</div>
-            <p>Red champ title</p>
+            <div class="graph-div">
+                <p>Graph div</p>
+            </div>
         </div>
     </div>
 </body>

@@ -1,9 +1,23 @@
 /* WIDESCREEN STYLES */
 @media screen and (min-width: 1550px) {
-    div.mobile.container, div.medium.container {
+    .only-mobile {
         display: none;
     }
     h1 {
-        text-align: justify-all;
+        margin-left: 200px;
     }
+    div.component-container {
+        display: grid;
+        grid-template-columns: 500px auto 500px;
+        /* grid-template-rows: 400px 400px 400px; */
+    }
+    .champ-div.blue-champ {
+        grid-row:1;
+        grid-column: 1;
+    }
+    .champ-div.red-champ {
+        grid-row: 1;
+        grid-column: 3;
+    }
+
 }

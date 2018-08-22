@@ -1,14 +1,22 @@
+/* COMMON STYLES */
 html {
     box-sizing: border-box;
 }
 *, *:before, *:after {
     box-sizing: inherit;
 }
-/* COMMON STYLES */
 body {
     background-color: #222;
     color: white;
 }
+.container {
+    padding-top: 15px;
+}
+h1, h2 {
+    margin: 20px;
+    display: inline;
+}
+
 .champ-div {
     padding: 10px;
     margin: 15px;
@@ -44,12 +52,24 @@ img.champ-icon {
     display: grid;
     grid-template-columns: auto 72px 72px;
 }
+p.items-summs {
+    font-size: 0.7rem
+}
 .items {
     display: grid;
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
+    margin: 0 auto;
 }
 .item {
     justify-self: center;
     margin: 4px;
+}
+.graph-div {
+    margin: 15px;
+    outline: 2px solid white;
+}
+.runes-container {
+    margin: 5px;
+    outline: 2px solid black;
 }
