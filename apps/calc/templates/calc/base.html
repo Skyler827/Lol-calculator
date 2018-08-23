@@ -8,7 +8,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/normalize.css' %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>    
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/common.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/mobile.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/medium.css' %}">
@@ -16,6 +17,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'calc/css/modals-common.css' %}">
     <script src="{% static 'calc/js/champ_select.js' %}"></script>
     <script src="{% static 'calc/js/summoner_select.js' %}"></script>
+    <script src="{% static 'calc/js/item_select.js' %}"></script>
+    <script src="{% static 'calc/js/canvas_text.js' %}"></script>
 </head>
 <body>
     <div class="container">
@@ -26,8 +29,8 @@
             <div class="champ-div blue-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
-                    <a class="clickable-image-container" href="#blue-champ-select" rel="modal:open">
-                        <img class="champ-icon" src="{% static 'calc/img/champ_square/black_square.png' %}">
+                    <a class="clickable-image-container" rel="modal:open">
+                        <img class="champ-icon" src="{% static 'calc/img/black_square.png' %}">
                         <div class="middle">Select a champion</div>
                     </a>
                     <p class="champ-name">[None selected]</p>
@@ -35,16 +38,38 @@
                 <div class="champ-details blue">
                     <div class="title-n-summs">
                         <p class="items-summs">Items\Summoners:</p>
-                        <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerFlash.png' %}">
-                        <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerHeal.png' %}">                
+                        <div class="summ-outerdiv-D">
+                            <a class="clickable-image-container summoner-spell">
+                                <img class="summoner-spell" src="{% static 'calc/img/black_square.png' %}">
+                                <div class="middle"><span>summ spell </span>D</div>
+                            </a>
+                        </div>
+                        <div class="summ-outerdiv-F">
+                            <a class="clickable-image-container summoner-spell">
+                                <img class="summoner-spell" src="{% static 'calc/img/black_square.png' %}">
+                                <div class="middle"><span>summ spell </span>F</div>
+                            </a>
+                        </div>
                     </div>
                     <div class="items">
-                        <img class="item" src="{% static 'calc/img/items/3095.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3085.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3031.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3006.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3072.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3046.png' %}">
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item2 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item3 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="iterm4 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="iterm5 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="iterm6 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
                     </div>
                     <div class="runes-container">
                         <div class="runes-primary-tree">
@@ -84,7 +109,7 @@
             <div class="champ-div red-champ">
                 <div class="inner-champ-div">
                     <p>Champion:</p>
-                    <a class="clickable-image-container" href="#blue-champ-select" rel="modal:open">
+                    <a class="clickable-image-container" rel="modal:open">
                         <img class="champ-icon" src="{% static 'calc/img/champ_square/black_square.png' %}">
                         <div class="middle">Select a champion</div>
                     </a>
@@ -93,16 +118,39 @@
                 <div class="champ-details red">
                     <div class="title-n-summs">
                         <p class="items-summs">Items\Summoners:</p>
-                        <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerFlash.png' %}">
-                        <img class="summoner-spell" src="{% static 'calc/img/summoner/SummonerExhaust.png' %}">                
-                    </div>
+                        <div class="summ-outerdiv-D">
+                                <a class="clickable-image-container summoner-spell">
+                                    <img class="summoner-spell" src="{% static 'calc/img/champ_square/black_square.png' %}">
+                                    <div class="middle"><span>summ spell </span>D</div>
+                                </a>
+                            </div>
+                            <div class="summ-outerdiv-F">
+                                <a class="clickable-image-container summoner-spell">
+                                    <img class="summoner-spell" src="{% static 'calc/img/champ_square/black_square.png' %}">
+                                    <div class="middle"><span>summ spell </span>F</div>
+                                </a>
+                            </div>
+                        </div>
                     <div class="items">
-                        <img class="item" src="{% static 'calc/img/items/3107.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3504.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3092.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/2055.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3174.png' %}">
-                        <img class="item" src="{% static 'calc/img/items/3158.png' %}">
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                        <div class="item1 item-outerdiv">
+                            <img class="item" src="{% static 'calc/img/black_square.png' %}">
+                        </div>
+                                                                                                            
                     </div>
                     <div class="runes-container">
                         <div class="runes-primary-tree">
@@ -139,7 +187,7 @@
                 </div>
             </div>
             <div class="graph-div">
-                <p>Graph div</p>
+                <canvas class="canvas-graph"></canvas>
             </div>
         </div>
     </div>

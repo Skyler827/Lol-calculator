@@ -14,7 +14,23 @@
         width: 250px;
         margin: 0 auto;
     }
-        
+    .item, {
+        width: 64px;
+        height: 64px;
+    }
+    .title-n-summs > div {
+        display: inline-block;
+    }
+    a.clickable-image-container.summoner-spell {
+        width: 64px;
+    }
+    .title-n-summs {
+        display: block;
+    }
+    .title-n-summs .items-summs {
+        display: block;
+        position: relative;
+    }
 }
 /* smaller mobile phones */
 @media screen and (max-width: 550px) {
@@ -25,25 +41,14 @@
         width: 125px;
         margin: 0 auto;
     }
-
-    .item, img.summoner-spell {
+    .item-outerdiv img, a.clickable-image-container.summoner-spell {
         width: 32px;
         height: 32px;
     }
-    .title-n-summs {
-        grid-template-columns: auto 38px 38px;
-    }
-    .title-n-summs p {
+    a.clickable-image-container.summoner-spell span {
         display: none;
     }
-    .title-n-summs {
-        display: grid;
-        grid-template-columns: auto 38px;
-    }
-    .title-n-summs img {
-        justify-self: end;
-    
-    }
+
 
 }
 /* REALLY SMALL mobile phones */

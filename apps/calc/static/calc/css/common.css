@@ -8,6 +8,9 @@ html {
 body {
     background-color: #222;
 }
+a {
+    cursor: pointer;
+}
 .container {
     padding-top: 15px;
     color: white;
@@ -35,7 +38,7 @@ h1, h2, .usage-note {
     position: relative;
     display: block;
 }
-.clickable-image-container .middle{
+.middle{
     position: absolute;
     top: 50%;
     left: 50%;
@@ -59,6 +62,10 @@ img.champ-icon {
     width: 100%;
     max-width: 192px;
 }
+img.summoner-spell {
+    width: 100%;
+
+}
 .champ-details {
     padding: 6px;
 }
@@ -75,9 +82,15 @@ p.items-summs {
     grid-template-columns: 1fr 1fr 1fr;
     justify-content: center;
 }
+.item-outerdiv img {
+    cursor: pointer;
+    width: 64px;
+    height: 64px;
+}
 .item {
     margin: 4px;
 }
+
 .graph-div {
     margin: 15px;
     outline: 2px solid white;

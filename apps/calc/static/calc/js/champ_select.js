@@ -32,9 +32,9 @@ $(function() {
 
             $(a_tag).click(function(_) {
                 let champ_path = "/static/calc/img/champ_square/"+champs[i]+".png";
-                $("."+color+"-champ .champ-icon").attr("src", champ_path);
-                $("."+color+"-champ .clickable-image-container div.middle").hide();
-                $("."+color+"-champ p.champ-name").text(champs[i]);
+                $("."+color+"-champ .inner-champ-div .champ-icon").attr("src", champ_path);
+                $("."+color+"-champ .inner-champ-div .clickable-image-container div.middle").hide();
+                $("."+color+"-champ .inner-champ-div p.champ-name").text(champs[i]);
                 $(champ_select).dialog("close");
             });
         }
@@ -49,7 +49,8 @@ $(function() {
                 Cancel: function() {
                     $( this ).dialog( "close" );
                 }
-            }
+            },
+            appendTo: "body"
         });
         return champ_select;
     }
@@ -59,13 +60,11 @@ $(function() {
         $("#blue-champ-select").dialog("option", "width", 0.7*window.innerWidth);
     });
     //make links open the dialogs:
-    $(".blue-champ a.clickable-image-container").click(function(e) {
-        var champ_select = make_champ_select("blue");
-        document.appendChild(champ_select);
+    $(".blue-champ .inner-champ-div a.clickable-image-container").click(function(e) {
+        make_champ_select("blue");
     });
-    $(".red-champ a.clickable-image-container").click(function(e) {
-        var champ_select = make_champ_select("red");
-        document.appendChild(champ_select);
+    $(".red-champ .inner-champ-div a.clickable-image-container").click(function(e) {
+        make_champ_select("red");
     });
 
 });

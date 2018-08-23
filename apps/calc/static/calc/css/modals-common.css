@@ -7,7 +7,13 @@
     margin: 5px;
     padding: 15px;
     position: relative;
+    width: 86px;
+    vertical-align: top;
 }
+.my-modal .selectable.selectable-champ {
+    width: unset;
+}
+.my-modal 
 .my-modal .selectable p {
     margin: 0;
 }
@@ -23,4 +29,3 @@
   
     z-index: 1;
 }
-summoner-spell-modal {}

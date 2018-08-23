@@ -24,7 +24,6 @@ def run_combat(blue_champion_name:str, red_champion_name:str):
             time_elapsed += time_passes
             this_event["red_attack"] = red_side_champ.basic_attack(blue_side_champ)
             red_champ_must_wait += red_side_champ.get_attack_time()
-
         elif blue_champ_must_wait < red_champ_must_wait:
             # Time passes, then Blue attacks Red
             time_passes = blue_champ_must_wait

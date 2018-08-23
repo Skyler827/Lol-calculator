@@ -18,6 +18,11 @@
         grid-row: 1;
         grid-column: 3;
     }
+    .title-n-summs {
+        display: grid;
+        grid-template-columns: auto 38px 38px;
+        grid-gap: 10px;
+    }
 
 }
 /* smaller widescreen */
@@ -31,13 +36,8 @@
         width: 32px;
         height: 32px;
     }
-    .title-n-summs {
-        grid-template-columns: auto 38px 38px;
-        grid-gap: 10px;
-    }
-    .title-n-summs {
-        display: grid;
-        grid-template-columns: auto 38px;
+    .title-n-summs .clickable-image-container span {
+        display: none;
     }
     .items {
         margin: 0 auto;
@@ -57,6 +57,9 @@
         border-radius: 100%;
         font-size: 0.75rem;
     }
+    .title-n-summs {
+        grid-template-columns: auto 64px 64px;
 
+    }
 
 }
