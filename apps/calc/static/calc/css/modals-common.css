@@ -1,20 +1,20 @@
-.champ-select-modal {
+.my-modal {
     max-width: none;
     background-color: lightgray;
 }
-.champ-select-modal .selectable-champ{
+.my-modal .selectable {
     display: inline-block;
     margin: 5px;
     padding: 15px;
     position: relative;
 }
-.champ-select-modal .selectable-champ p {
+.my-modal .selectable p {
     margin: 0;
 }
-.champ-select-modal .selectable-champ:hover {
+.my-modal .selectable:hover {
     background-color: gray;
 }
-.champ-select-modal .selectable-champ a span {
+.my-modal .selectable a span {
     position:absolute; 
     width:100%;
     height:100%;
@@ -23,6 +23,4 @@
   
     z-index: 1;
 }
-.modal a.close-link {
-    display: block;
-}
+summoner-spell-modal {}
