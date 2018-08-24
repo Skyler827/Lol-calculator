@@ -1,4 +1,4 @@
-import champion as c
+from champion import Champion as c
 
 def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float):
     return {

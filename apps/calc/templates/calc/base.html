@@ -18,6 +18,7 @@
     <script src="{% static 'calc/js/champ_select.js' %}"></script>
     <script src="{% static 'calc/js/summoner_select.js' %}"></script>
     <script src="{% static 'calc/js/item_select.js' %}"></script>
+    <script src="{% static 'calc/js/level_select.js' %}"></script>
     <script src="{% static 'calc/js/canvas_text.js' %}"></script>
 </head>
 <body>
@@ -34,6 +35,7 @@
                         <div class="middle">Select a champion</div>
                     </a>
                     <p class="champ-name">[None selected]</p>
+                    <span>Level: </span><select class="level-selector"></select>
                 </div>
                 <div class="champ-details blue">
                     <div class="title-n-summs">
@@ -114,6 +116,7 @@
                         <div class="middle">Select a champion</div>
                     </a>
                     <p class="champ-name">[None selected]</p>
+                    <span>Level: </span><select class="level-selector"></select>
                     </div>
                 <div class="champ-details red">
                     <div class="title-n-summs">
@@ -188,6 +191,9 @@
             </div>
             <div class="graph-div">
                 <canvas class="canvas-graph"></canvas>
+            </div>
+            <div class="event-list">
+                <input class="run-combat-submit" type="submit" value="Compute">
             </div>
         </div>
     </div>

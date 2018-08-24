@@ -6,12 +6,6 @@ $(function() {
             datasets: [{
                 label: 'Blue Champ HP',
                 data: [
-                    {x:0, y:100},
-                    {x:1, y:85},
-                    {x:2, y:70},
-                    {x:3, y:100},
-                    {x:4, y:50},
-                    {x:5, y:20}
                 ],
                 backgroundColor: 'rgba(0, 0, 160, 0.2)',
                 borderColor: 'rgba(20, 20, 255, 0.8)',
@@ -20,12 +14,6 @@ $(function() {
             }, {
                 label: "Red Champ HP",
                 data: [
-                    {x:0, y:150},
-                    {x:1, y:20},
-                    {x:2, y:10},
-                    {x:3, y:30},
-                    {x:4, y:5},
-                    {x:5, y:0}
                 ],
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255,99,132,1)',
@@ -44,5 +32,25 @@ $(function() {
                 }]
             }
         }
+    });
+    $("input.run-combat-submit").click(function(e){
+        $.ajax("/run_combat", {success: (function(data){
+            //clear old data
+            myChart.data.datasets[0].data = [];
+            myChart.data.datasets[1].data = [];
+
+            //Add new data
+            let xhr_blue_data = data["blue-champ"];
+            let chart_blue_data = myChart.data.datasets[0].data;
+            for (let i=0; i< xhr_blue_data.length; i++) {
+                chart_blue_data.push(xhr_blue_data[i]);
+            }
+            let chart_red_data = myChart.data.datasets[1].data;
+            let xhr_red_data = data["red-champ"];
+            for (let i=0; i< xhr_red_data.length; i++) {
+                chart_red_data.push(xhr_red_data[i]);
+            }
+            myChart.update()
+        })});
     });
 });

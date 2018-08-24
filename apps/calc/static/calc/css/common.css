@@ -62,6 +62,9 @@ img.champ-icon {
     width: 100%;
     max-width: 192px;
 }
+select.level-selector {
+    color: black;
+}
 img.summoner-spell {
     width: 100%;
 
@@ -131,4 +134,14 @@ p.items-summs {
     border-radius: 100%;
     background-color: black;
     text-align: center;
+}
+.event-list {
+    margin: 13px;
+    padding: 15px;
+    background-color: #666;
+    overflow: auto;
+}
+.event-list .run-combat-submit {
+    background-color: lightgreen;
+    color: black;
 }

@@ -13,9 +13,17 @@
 .my-modal .selectable.selectable-champ {
     width: unset;
 }
+.my-modal .selectable.selectable-champ img {
+    width: 84px;
+    height: 84px;
+}
 .my-modal 
 .my-modal .selectable p {
     margin: 0;
+}
+.my-modal .selectable.selectable-item img {
+    margin: 0 auto;
+    display: block;
 }
 .my-modal .selectable:hover {
     background-color: gray;

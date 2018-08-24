@@ -49,6 +49,9 @@ $(function() {
             width: 0.7 * window.innerWidth,
             autoOpen: true,
             modal: true,
+            draggable: false,
+            resizable: false,
+            maxHeight: document.documentElement.clientHeight-20,
             buttons: {
                 Cancel: function() {
                     $( this ).dialog( "close" );

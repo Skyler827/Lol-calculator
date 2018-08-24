@@ -9,6 +9,7 @@
     div.component-container {
         display: grid;
         grid-template-columns: 500px auto 500px;
+        grid-template-rows: 500px 320px;
     }
     .champ-div.blue-champ {
         grid-row:1;
@@ -22,6 +23,10 @@
         display: grid;
         grid-template-columns: auto 38px 38px;
         grid-gap: 10px;
+    }
+    .event-list {
+        grid-column: 2;
+        grid-row: 2;
     }
 
 }
