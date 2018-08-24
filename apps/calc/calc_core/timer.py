@@ -20,7 +20,7 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_cha
     events = []
     blue_champ_hp = []
     red_champ_hp = []
-    dt = 0.001
+    dt = 0
     while (blue_side_champ.hp > 0 and red_side_champ.hp > 0):
         this_event = {}
         if red_champ_must_wait < blue_champ_must_wait:
