@@ -30,7 +30,15 @@ def get_item_ids(request):
     conn.commit()
     return JsonResponse(data, safe=False)
 def simulate_combat(request):
-    x = run_combat("Ahri", "Veigar")
+    print(request.GET)
+    x = run_combat(
+        blue_champion_name=request.GET["blue_champ"],
+        blue_champ_level=request.GET["blue_level"],
+        blue_champ_items=request.GET["blue_items[]"],
+        red_champion_name=request.GET["red_champ"],
+        red_champ_level=request.GET["red_level"],
+        red_champ_items=request.GET["red_items[]"]
+    )
     return JsonResponse({
         "blue-champ": x["blue_champ_hp"],
         "red-champ": x["red_champ_hp"],

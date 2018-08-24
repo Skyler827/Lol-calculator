@@ -126,6 +126,7 @@ class Item:
 class Champion(AbstractMinion):
     def __init__(self, name:str):
         print(db_name)
+        print(name)
         conn = sqlite3.connect(db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()

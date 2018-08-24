@@ -42,24 +42,59 @@ $(function() {
             }
         }
     });
+    function get_items(color) {
+        var item_ids = [];
+        $("."+color+"-champ img.item").each(function(element) {
+            if ($(this)[0].attributes.src.nodeValue == "/static/calc/img/black_square.png") {return;}
+            console.log($(this));
+            item_ids.push($(this)[0].attributes.src.nodeValue.slice(23,-4));
+        });
+        return item_ids;
+    }
     $("input.run-combat-submit").click(function(e){
-        $.ajax("/run_combat", {success: (function(data){
-            //clear old data
-            myChart.data.datasets[0].data = [];
-            myChart.data.datasets[1].data = [];
+        //Get champs
+        var blue_champ_name = "Ahri";
+        var red_champ_name = "Ekko";
+        var blue_items = [];
+        var red_items = [];
+        var blue_level = 1;
+        var red_level = 1;
+        blue_champ_name = $(".blue-champ img.champ-icon")[0].attributes.src.nodeValue.slice(30,-4);
+        red_champ_name = $(".red-champ img.champ-icon")[0].attributes.src.nodeValue.slice(30,-4);
+        blue_items = get_items("blue");
+        red_items = get_items("red");
+        blue_level = $(".blue-champ select option:selected").val();
+        red_level = $(".red-champ select option:selected").val();
+        $.ajax("/run_combat", {
+            data: {
+                blue_champ: blue_champ_name,
+                red_champ: red_champ_name,
+                blue_items: blue_items,
+                red_items: red_items,
+                blue_level: blue_level,
+                red_level: red_level,
+            },
+            success: (function(data){
+                //clear old data
+                myChart.data.datasets[0].data = [];
+                myChart.data.datasets[1].data = [];
 
-            //Add new data
-            let xhr_blue_data = data["blue-champ"];
-            let chart_blue_data = myChart.data.datasets[0].data;
-            for (let i=0; i< xhr_blue_data.length; i++) {
-                chart_blue_data.push(xhr_blue_data[i]);
+                //Add new data
+                let xhr_blue_data = data["blue-champ"];
+                let chart_blue_data = myChart.data.datasets[0].data;
+                for (let i=0; i< xhr_blue_data.length; i++) {
+                    chart_blue_data.push(xhr_blue_data[i]);
+                }
+                let chart_red_data = myChart.data.datasets[1].data;
+                let xhr_red_data = data["red-champ"];
+                for (let i=0; i< xhr_red_data.length; i++) {
+                    chart_red_data.push(xhr_red_data[i]);
+                }
+                myChart.update()
+            }),
+            error: function(data) {
+                console.log(data);
             }
-            let chart_red_data = myChart.data.datasets[1].data;
-            let xhr_red_data = data["red-champ"];
-            for (let i=0; i< xhr_red_data.length; i++) {
-                chart_red_data.push(xhr_red_data[i]);
-            }
-            myChart.update()
-        })});
+        });
     });
 });

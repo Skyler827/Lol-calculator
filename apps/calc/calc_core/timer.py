@@ -1,3 +1,4 @@
+from typing import List
 import champion as c
 
 def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float):
@@ -6,7 +7,8 @@ def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float):
         "blue_champ_hp":blue_champ.hp,
         "red_champ_hp":red_champ.hp,
     }
-def run_combat(blue_champion_name:str, red_champion_name:str):
+def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_champ_items:List=[], 
+        red_champion_name:str="Veigar", red_champ_level:int=1, red_champ_items:List=[]):
     blue_side_champ = c.Champion(blue_champion_name)
     red_side_champ = c.Champion(red_champion_name)
     red_champ_must_wait = 0
