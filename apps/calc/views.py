@@ -3,6 +3,7 @@ import os
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .calc_core import initializedb as init
+from .calc_core.timer import run_combat
 latest_patch: str = "8.16.1"
 db_name:str = os.path.join("data", latest_patch, "league_data.db")
 
@@ -29,20 +30,8 @@ def get_item_ids(request):
     conn.commit()
     return JsonResponse(data, safe=False)
 def simulate_combat(request):
+    x = run_combat("Ahri", "Veigar")
     return JsonResponse({
-        "red-champ": [
-            {"x":0, "y":150},
-            {"x":1, "y":20},
-            {"x":2, "y":10},
-            {"x":3, "y":30},
-            {"x":4, "y":5},
-            {"x":5, "y":0}
-        ], "blue-champ": [
-            {"x":0, "y":100},
-            {"x":1, "y":85},
-            {"x":2, "y":70},
-            {"x":3, "y":100},
-            {"x":4, "y":50},
-            {"x":5, "y":20}
-        ]
+        "blue-champ": x["blue_champ_hp"],
+        "red-champ": x["red_champ_hp"],
     })

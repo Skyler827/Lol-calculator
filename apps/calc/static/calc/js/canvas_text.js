@@ -11,6 +11,8 @@ $(function() {
                 borderColor: 'rgba(20, 20, 255, 0.8)',
                 borderWidth: 1,
                 showLine: true,
+                lineTension: 0,
+
             }, {
                 label: "Red Champ HP",
                 data: [
@@ -19,6 +21,7 @@ $(function() {
                 borderColor: 'rgba(255,99,132,1)',
                 borderWidth: 1,
                 showLine: true,
+                lineTension: 0,
 
             }
         ]
@@ -27,7 +30,13 @@ $(function() {
             scales: {
                 yAxes: [{
                     ticks: {
+                        min: 0,
                         beginAtZero:true
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        min: 0,
                     }
                 }]
             }

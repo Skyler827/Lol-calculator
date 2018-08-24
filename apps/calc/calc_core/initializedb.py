@@ -10,7 +10,13 @@ sys.path.append(os.path.join(sys.path[0],"apps", "calc", "calc_core"))
 import champ_statistics as cs
 
 latest_patch: str = "8.16.1"
-db_name:str = os.path.join("data", latest_patch, "league_data.db")
+this_directory = os.path.dirname(os.path.realpath(__file__))
+tmp_dir = this_directory
+for i in range(3):
+    tmp_dir = os.path.split(tmp_dir)[0]
+project_directory = tmp_dir
+
+db_name:str = os.path.join(project_directory, "data", latest_patch, "league_data.db")
 champion_json_filename:str = os.path.join("data", latest_patch, "champion.json")
 item_json_filename:str = os.path.join("data", latest_patch, "items.json")
 
