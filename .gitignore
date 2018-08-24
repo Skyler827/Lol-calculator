@@ -10,3 +10,7 @@ league_data.db
 items.json
 __pycache__
 db.sqlite3
+static/
+apps/calc/static/calc/img/champ_square/
+apps/calc/static/calc/img/items/
+apps/calc/static/calc/img/summoner/

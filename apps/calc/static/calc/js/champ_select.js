@@ -4,6 +4,10 @@
 // 3 makes selections in the dialogs select the champs and closes the dialogs
 
 $(function() {
+    var champ_ids_names = [];
+    $.ajax({url:"/champ_id_names", success: function(result){
+        champ_ids_names = result;
+    }});
     function make_champ_select(color) {
         var champ_select = document.createElement("div");
         champ_select.id = color+"-champ-select";
@@ -14,27 +18,27 @@ $(function() {
         champ_select.appendChild(p_tag);
         //TODO: write a django view for getting all the champs in json format
         //      then write an ajax request here to get all the champ names
-        var champs = ["Ashe", "Taric", "Lulu"];
-        for (let i=0; i< champs.length; i++) {
+
+        for (let i=0; i< champ_ids_names.length; i++) {
             let div = document.createElement("div");
             div.classList.add("selectable");
             div.classList.add("selectable-champ");
             let img = document.createElement("img");
-            img.src = "static/calc/img/champ_square/"+champs[i]+".png";
+            img.src = "static/calc/img/champ_square/"+champ_ids_names[i][0]+".png";
             div.appendChild(img);
             let champ_p_tag = document.createElement("p");
             let a_tag = document.createElement("a");
-            a_tag.text = champs[i];
+            a_tag.text = champ_ids_names[i][1];
             a_tag.appendChild(document.createElement("span"));
             champ_p_tag.appendChild(a_tag);
             div.appendChild(champ_p_tag);
             champ_select.appendChild(div);
 
             $(a_tag).click(function(_) {
-                let champ_path = "/static/calc/img/champ_square/"+champs[i]+".png";
+                let champ_path = "/static/calc/img/champ_square/"+champ_ids_names[i][0]+".png";
                 $("."+color+"-champ .inner-champ-div .champ-icon").attr("src", champ_path);
                 $("."+color+"-champ .inner-champ-div .clickable-image-container div.middle").hide();
-                $("."+color+"-champ .inner-champ-div p.champ-name").text(champs[i]);
+                $("."+color+"-champ .inner-champ-div p.champ-name").text(champ_ids_names[i][1]);
                 $(champ_select).dialog("close");
             });
         }
