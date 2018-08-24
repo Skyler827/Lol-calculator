@@ -187,6 +187,7 @@ class Champion(AbstractMinion):
         self.buffs: [Buff] = []
         self.debuffs: [Debuff] = []
         self.hp: float = self.get_maxhp()
+        self.mp: float = self.get_maxmp()
         self.exp: int = 0
         self.gold: int = 0
         self.shield = []
@@ -205,7 +206,7 @@ class Champion(AbstractMinion):
         atk_spd = ChampStatistic.ATTACK_SPEED_PERCENT
         base_attack_speed = 0.625/(1+self.attackspeed_offset)
         l = self.level
-        level_bonus = self.attackspeed_perlevel * ((7/400)*(l**2)+(267/400)*(l-1))
+        level_bonus = self.attackspeed_perlevel/100 * ((7/400)*(l**2)+(267/400)*(l-1))
         items_bonus = 0
         for item in self.items:
             for attribute in item.attribute_modifiers:
@@ -224,6 +225,11 @@ class Champion(AbstractMinion):
         while (self.level < should_be_level):
             self.level_up()
         assert(self.level == should_be_level)
+    def set_level(self, level:int):
+        print(level)
+        print(type(level))
+        self.level = int(level)
+        self.hp = self.get_maxhp()
     def level_up(self) -> None:
         hp_percent = self.hp / self.get_maxhp()
         self.level += 1
