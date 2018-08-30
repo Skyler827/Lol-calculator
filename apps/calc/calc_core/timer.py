@@ -9,10 +9,16 @@ def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float):
     }
 def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_champ_items:List=[], 
         red_champion_name:str="Veigar", red_champ_level:int=1, red_champ_items:List=[]):
+    ## declaration:
     blue_side_champ = c.Champion(blue_champion_name)
-    blue_side_champ.set_level(blue_champ_level)
     red_side_champ = c.Champion(red_champion_name)
+    ## levels
+    blue_side_champ.set_level(blue_champ_level)
     red_side_champ.set_level(red_champ_level)
+    ## items
+    blue_side_champ.items
+    x = c.load_item("1031")
+    print(x.attribute_modifiers)
     red_champ_must_wait = 0
     blue_champ_must_wait = 0
     time_elapsed = 0
@@ -64,11 +70,17 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_cha
         else: raise Exception
         this_event["new_status"] = get_status(blue_side_champ, red_side_champ, time_elapsed)
         events.append(this_event)
+        if time_elapsed > 60:
+            break
     winner = None
     if red_side_champ.hp > 0:
         winner = red_side_champ
+        red_champ_hp.append({"x": time_elapsed, "y":red_side_champ.hp})
+        blue_champ_hp[-1]["y"] = 0
     elif blue_side_champ.hp > 0:
         winner = blue_side_champ
+        blue_champ_hp.append({"x": time_elapsed, "y": blue_side_champ.hp})
+        red_champ_hp[-1]["y"] = 0
     elif blue_side_champ.hp == red_side_champ.hp == 0:
         pass
     return {
@@ -81,12 +93,3 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_cha
         "blue_champ_hp": blue_champ_hp,
         "red_champ_hp": red_champ_hp
     }
-def main():
-    x = run_combat("Ahri", "Veigar")
-    print(f"It's {x['blue_champ']} on blue vs {x['red_champ']} on red.")
-    print(x["initial"])
-    for i in x["events"]:
-        print(i)
-    print(x["winner"] + " wins!")
-if __name__ == "__main__":
-    main()

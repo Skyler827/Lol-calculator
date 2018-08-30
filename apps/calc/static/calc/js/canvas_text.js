@@ -12,7 +12,6 @@ $(function() {
                 borderWidth: 1,
                 showLine: true,
                 lineTension: 0,
-
             }, {
                 label: "Red Champ HP",
                 data: [
@@ -22,7 +21,6 @@ $(function() {
                 borderWidth: 1,
                 showLine: true,
                 lineTension: 0,
-
             }
         ]
         },
@@ -39,7 +37,21 @@ $(function() {
                         min: 0,
                     }
                 }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+            
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += tooltipItem.yLabel.toFixed(2);
+                        return label;
+                    }
+                }
             }
+
         }
     });
     function get_items(color) {
@@ -51,7 +63,7 @@ $(function() {
         });
         return item_ids;
     }
-    $("input.run-combat-submit").click(function(e){
+    $("input.run-combat-submit").click(function(_e){
         //Get champs
         var blue_champ_name = "Ahri";
         var red_champ_name = "Ekko";
@@ -78,8 +90,9 @@ $(function() {
                 //clear old data
                 myChart.data.datasets[0].data = [];
                 myChart.data.datasets[1].data = [];
-
                 //Add new data
+                myChart.data.datasets[0].label = blue_champ_name+" HP";
+                myChart.data.datasets[1].label = red_champ_name+" HP";
                 let xhr_blue_data = data["blue-champ"];
                 let chart_blue_data = myChart.data.datasets[0].data;
                 for (let i=0; i< xhr_blue_data.length; i++) {

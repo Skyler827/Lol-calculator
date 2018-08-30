@@ -5,7 +5,7 @@ import os.path
 import json
 import sqlite3
 import abc
-from champ_statistics import ChampStatistic
+from champ_statistics import ChampStatistic, get_stat_from_string
 from damage_type import DamageType
 from damage_ratio import DamageRatio
 from resourcebar import ResourceBarType, resourcebar_from_text
@@ -119,14 +119,23 @@ class onHitEffect():
     def apply_effect(self, target):
         target
 class Item:
-    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, float]], unique_passives:List[Tuple[str, Tuple[ChampStatistic, int]]], passive_effect:Buff):
+    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, float]], 
+    unique_passives:List[Tuple[str,Tuple[ChampStatistic, int]]]=[], passive_effect:Buff=None):
+
         self.attribute_modifiers = attribute_modifiers
         self.unique_passives = unique_passives
         self.passive_effect = passive_effect
+def load_item(item_id:str) -> Item:
+    conn = sqlite3.connect(db_name)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    sql = "SELECT champ_statistics.name AS stat, item_stats.mod AS mod FROM champ_statistics " + \
+        "JOIN item_stats ON item_stats.stat=champ_statistics.id WHERE item_stats.item=:id"
+    stats = c.execute(sql, {"id":item_id}).fetchall()
+    attr:List[Tuple[ChampStatistic, float]] = list(map(lambda row: (eval("ChampStatistic."+row[0]), float(row[1])), stats))
+    return Item(attribute_modifiers=attr)
 class Champion(AbstractMinion):
     def __init__(self, name:str):
-        print(db_name)
-        print(name)
         conn = sqlite3.connect(db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
@@ -170,6 +179,7 @@ class Champion(AbstractMinion):
         self.attackdamage_base = r["attackdamage"]
         self.attackdamage_perlevel = r["attackdamageperlevel"]
         self.attackdamage_bonus = 0
+        self.attackdamage_bonus_percent = 0
         self.attackspeed_offset = r["attackspeedoffset"]
         self.attackspeed_perlevel = r["attackspeedperlevel"]
         self.abilitypower_flat = 0
@@ -226,15 +236,50 @@ class Champion(AbstractMinion):
             self.level_up()
         assert(self.level == should_be_level)
     def set_level(self, level:int):
-        print(level)
-        print(type(level))
         self.level = int(level)
         self.hp = self.get_maxhp()
     def level_up(self) -> None:
         hp_percent = self.hp / self.get_maxhp()
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
-    
+    def add_stat_mod(self. stat:ChampStatistic, mod: float):
+        if stat == ChampStatistic.ATTACK_DAMAGE:
+            self.attackdamage_bonus += mod
+        if stat == ChampStatistic.ATTACK_DAMAGE_BONUS_PERCENT:
+            self.attackdamage_bonus_percent += mod
+        if stat == ChampStatistic.ATTACK_SPEED_PERCENT:
+            self.attackrange_bonus_percent += mod
+        if stat == ChampStatistic.ABILITY_POWER:
+            self.abilitypower_flat += mod
+        if stat == ChampStatistic.ABILITY_POWER_PERCENT:
+            self.abilitypower_percent += mod
+        if stat == ChampStatistic.CRIT_CHANCE #crit items
+        if stat == ChampStatistic.CRIT_DAMAGE #jhin/yasuo/ashe/shaco passives, fiora bladework # Defensive:
+        if stat == ChampStatistic.HP #many items
+        if stat == ChampStatistic.HP_BONUS_PERCENT #stoneplate active, several abilities
+        if stat == ChampStatistic.HP_REGEN #dorans shield, guardian horn, potions
+        if stat == ChampStatistic.HP_REGEN_PERCENT #many items
+        if stat == ChampStatistic.ARMOR #many items
+        if stat == ChampStatistic.ARMOR_PERCENT 
+        if stat == ChampStatistic.MAGIC_RESIST
+        if stat == ChampStatistic.TENACITY
+        if stat == ChampStatistic.SLOW_RESIST # Utility:
+        if stat == ChampStatistic.COOLDOWN_REDUCTION
+        if stat == ChampStatistic.MAX_COOLDOWN_REDUCTION
+        if stat == ChampStatistic.MANA
+        if stat == ChampStatistic.MANA_REGEN
+        if stat == ChampStatistic.MANA_REGEN_PERCENT
+        if stat == ChampStatistic.MANA_REGEN_IN_JUNGLE
+        if stat == ChampStatistic.ENERGY_REGEN
+        if stat == ChampStatistic.ENERGY_REGEN_PERCENT
+        if stat == ChampStatistic.HEAL_AND_SHIELD_POWER
+        if stat == ChampStatistic.MOVE_SPEED_FLAT
+        if stat == ChampStatistic.MOVE_SPEED_PERCENT
+        if stat == ChampStatistic.ATTACK_RANGE
+        if stat == ChampStatistic.ATTACK_RANGE_PERCENT
+        if stat == ChampStatistic.GOLD_GENERATION
+    def add_item(self, item:Item):
+        pass
     def take_damage(self, attack: Damage) -> float:
         if attack.type == DamageType.PHYSICAL:
             armor = self.get_armor()
