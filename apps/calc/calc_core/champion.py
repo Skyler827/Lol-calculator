@@ -268,7 +268,7 @@ class Champion(AbstractMinion):
         g = self.hp_perlevel
         n = self.level
         bonus = self.hp_bonus
-        return b + g * (n-1) * (0.7025 + (n-1)) + bonus
+        return b + g * (n-1) * (0.7025 + 0.0175 * (n-1)) + bonus
     def get_maxmp(self) -> float:
         b = self.mp_base
         g = self.mp_perlevel
