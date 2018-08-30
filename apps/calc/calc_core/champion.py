@@ -281,11 +281,10 @@ class Champion(AbstractMinion):
         n = self.level
         bonus = self.attackdamage_bonus
         mult = self.attackdamage_bonus_percent
-        return (b + g * (n-1) * (0.7025 + (n-1)) + bonus) * mult
+        return (b + g * (n-1) * (0.7025 + (n-1)) + bonus) * (1+mult)
     def get_abilitypower(self) -> float:
         return self.abilitypower_flat * (1 + self.abilitypower_percent)
     def get_attack_time(self) -> float:
-        atk_spd = ChampStatistic.ATTACK_SPEED_PERCENT
         base_attack_speed = 0.625/(1+self.attackspeed_offset)
         l = self.level
         level_bonus = self.attackspeed_perlevel/100 * ((7/400)*(l**2)+(267/400)*(l-1))

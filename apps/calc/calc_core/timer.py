@@ -16,6 +16,9 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:int = 1, blue_cha
     blue_side_champ.set_level(blue_champ_level)
     red_side_champ.set_level(red_champ_level)
     ## items
+    # print(blue_side_champ.items)
+    print(blue_champ_items)
+    print(type(blue_champ_items))
     blue_side_champ.items
     x = c.load_item("1031")
     print(x.attribute_modifiers)

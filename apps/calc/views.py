@@ -30,6 +30,7 @@ def get_item_ids(request):
     conn.commit()
     return JsonResponse(data, safe=False)
 def simulate_combat(request):
+    print(request.GET)
     blue_items = [] if "blue_items[]" not in request.GET else request.GET["blue_items[]"]
     red_items = [] if "red_items[]" not in request.GET else request.GET["red_items[]"]
     x = run_combat(
