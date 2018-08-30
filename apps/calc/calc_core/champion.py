@@ -1,10 +1,11 @@
-from typing import Dict, Tuple, List, IO
+from typing import Dict, Tuple, List, IO, NamedTuple
 from enum import Enum, auto
 import math
 import os.path
 import json
 import sqlite3
 import abc
+from collections import namedtuple
 from champ_statistics import ChampStatistic, get_stat_from_string
 from damage_type import DamageType
 from damage_ratio import DamageRatio
@@ -134,62 +135,120 @@ def load_item(item_id:str) -> Item:
     stats = c.execute(sql, {"id":item_id}).fetchall()
     attr:List[Tuple[ChampStatistic, float]] = list(map(lambda row: (eval("ChampStatistic."+row[0]), float(row[1])), stats))
     return Item(attribute_modifiers=attr)
+class Tenacity_obj():
+    """
+    all values are unit fractions, such as 0.05 + 0.05 = 0.1 implies 90% CC duration
+    """
+    def __init__(self):
+        self.elixirs_unflinching_ss_cd: float = 0
+        self.merc_treads_steraks: float = 0
+        self.garen_mundo_W_unflinching_10s_ss: float = 0
+        self.other: float = 0
+    def overall_cc_length(self) -> float:
+        t1 = self.elixirs_unflinching_ss_cd
+        t2 = self.merc_treads_steraks
+        t3 = self.garen_mundo_W_unflinching_10s_ss
+        t4 = self.other
+        return (1-t1)*(1-t2)*(1-t3)*(1-t4)
 class Champion(AbstractMinion):
     def __init__(self, name:str):
         conn = sqlite3.connect(db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         r:sqlite3.Row = c.execute("SELECT * FROM champions WHERE id=:name OR name=:name", {"name":name}).fetchone()
-        # static quantities:
         self.name = name
-        self.hp_base = r["hp"]
-        self.hp_perlevel = r["hpperlevel"]
-        self.hp_bonus = 0
-        self.hp_bonus_percent = 0
-        self.mp_base = r["mp"]
-        self.mp_perlevel = r["mpperlevel"]
-        self.mp_bonus = 0
         self.bartype:ResourceBarType = resourcebar_from_text(r["partype"])
-        self.movespeed_base = r["movespeed"]
-        self.movespeed_bonus_flat = 0
-        self.movespeed_bonus_percent = 0
-        self.armor_base = r["armor"]
-        self.armor_perlevel = r["armorperlevel"]
-        self.armor_bonus = 0
-        self.armor_bonus_percent = 0
-        self.armor_reduction_flat = 0
-        self.armor_reduction_percent = 0
-        self.spellblock_base = r["spellblock"]
-        self.spellblock_perlevel = ["spellblockperlevel"]
-        self.spellblock_bonus = 0
-        self.spellblock_bonus_percent = 0
-        self.spellblock_reduction_flat = 0
-        self.spellblock_reduction_percent = 0
-        self.attackrange = r["attackrange"]
-        self.attackrange_bonus_percent = 0
-        self.hpregen_base = r["hpregen"]
-        self.hpregen_perlevel = r["hpregenperlevel"]
-        self.hpregen_bonus_percent = 0
-        self.mpregen_base = r["mpregen"]
-        self.mpregen_perlevel = r["mpregenperlevel"]
-        self.mpregen_bonus_percent = 0
-        self.crit_base = r["crit"]
-        self.crit_perlevel = r["critperlevel"]
-        self.crit_bonus = 0
-        self.attackdamage_base = r["attackdamage"]
-        self.attackdamage_perlevel = r["attackdamageperlevel"]
-        self.attackdamage_bonus = 0
-        self.attackdamage_bonus_percent = 0
-        self.attackspeed_offset = r["attackspeedoffset"]
-        self.attackspeed_perlevel = r["attackspeedperlevel"]
-        self.abilitypower_flat = 0
-        self.abilitypower_percent = 0
+
+        # static quantities:
+        # only change when an item/buff/debuff is applied or removed
+        # Offensive
+        self.attackdamage_base:float = r["attackdamage"]
+        self.attackdamage_perlevel:float = r["attackdamageperlevel"]
+        self.attackdamage_bonus:float = 0
+        self.attackdamage_bonus_percent:float = 0
+
+        self.attackspeed_offset:float = r["attackspeedoffset"]
+        self.attackspeed_perlevel:float = r["attackspeedperlevel"]
+        self.attackspeed_bonus_percent:float = 0
+
+        self.attackrange:float = r["attackrange"]
+        self.attackrange_bonus_flat: float = 0
+        self.attackrange_bonus_percent:float = 0
+
+        self.abilitypower_flat:float = 0
+        self.abilitypower_percent:float = 0
+        
+        self.crit_base:float = r["crit"]
+        self.crit_perlevel:float = r["critperlevel"]
+        self.crit_bonus:float = 0
+        self.crit_damage_modifier:float = 2
+
         self.pen_armor_percent:List[float] = []
+        self.pen_lethality = 0
+
         self.pen_magic_flat = 0
         self.pen_magic_percent: List[float] = []
-        self.pen_lethality = 0
-        self.gp5 = 0
+
+        # Defensive
+        self.hp_base:float = r["hp"]
+        self.hp_perlevel:float = r["hpperlevel"]
+        self.hp_bonus:float = 0
+        self.hp_bonus_percent:float = 0
+
+        self.hpregen_base:float = r["hpregen"]
+        self.hpregen_perlevel:float = r["hpregenperlevel"]
+        self.hpregen_bonus_base:float = 0
+        self.hpregen_bonus_percent:float = 0
+
+        self.armor_base:float = r["armor"]
+        self.armor_perlevel:float = r["armorperlevel"]
+        self.armor_bonus:float = 0
+        self.armor_bonus_percent:float = 0
+        self.armor_reduction_flat:float = 0
+        self.armor_reduction_percent:float = 0
+
+        self.spellblock_base:float = r["spellblock"]
+        self.spellblock_perlevel:float = ["spellblockperlevel"]
+        self.spellblock_bonus:float = 0
+        self.spellblock_bonus_percent:float = 0
+        self.spellblock_reduction_flat:float = 0
+        self.spellblock_reduction_percent:float = 0
+
         self.damagereduction_percent = 0
+        
+        # Utility
+        self.mp_base:float = r["mp"]
+        self.mp_perlevel:float = r["mpperlevel"]
+        self.mp_bonus:float = 0
+
+        self.mpregen_base:float = r["mpregen"]
+        self.mpregen_perlevel:float = r["mpregenperlevel"]
+        self.mpregen_bonus_flat:float = 0
+        self.mpregen_bonus_percent:float = 0
+        self.tooth:bool = False # Jungle item mana regen in jungle
+
+        # cooldown reduction values are in terms of unit fractions, not percents
+        self.cooldown_reduction_spells = 0
+        self.cooldown_reduction_spells_max = 0.4
+        self.cooldown_reduction_ultumate = 0 #stacks multiplicatevly with spell cdr, without regard to spell cdr cap
+        self.cooldown_reduction_items = 0
+        self.cooldown_reduction_summoners = 0
+        
+        self.movespeed_base:float = r["movespeed"]
+        self.movespeed_bonus_flat:float = 0
+        self.movespeed_bonus_percent:float = 0
+        self.tenacity:Tenacity_obj = Tenacity_obj()
+        self.slow_resist = 0
+
+        #heal and shield power:
+        self.heal_shield_power = 0
+        self.health_restoration = 0 #spirit visage
+        self.revitalize = 0 # revitalize rune
+        self.grievous_wounds = 0
+        self.gp5 = 0
+
+        conn.commit()
+        conn.close()
 
         # dynamic quantities:
         self.level: int = 1
@@ -202,31 +261,35 @@ class Champion(AbstractMinion):
         self.gold: int = 0
         self.shield = []
         self.onHitEffects: List[onHitEffect] = []
-        conn.commit()
-        conn.close()
+        self.in_jungle:bool = False
+
     def get_maxhp(self) -> float:
-        return (self.hp_base + (self.level - 1) * self.hp_perlevel + self.hp_bonus) * (1 + self.hp_bonus_percent)
+        b = self.hp_base
+        g = self.hp_perlevel
+        n = self.level
+        bonus = self.hp_bonus
+        return b + g * (n-1) * (0.7025 + (n-1)) + bonus
     def get_maxmp(self) -> float:
-        return self.mp_base + (self.level-1) * self.mp_perlevel
+        b = self.mp_base
+        g = self.mp_perlevel
+        n = self.level
+        bonus = self.mp_bonus if self.bartype == ResourceBarType.MANA else 0
+        return b + g * (n-1) * (0.7025 + (n-1)) + bonus
     def get_attackdamage(self) -> float:
-        return self.attackdamage_base + (self.level-1) * self.attackdamage_perlevel
+        b = self.attackdamage_base
+        g = self.attackdamage_perlevel
+        n = self.level
+        bonus = self.attackdamage_bonus
+        mult = self.attackdamage_bonus_percent
+        return (b + g * (n-1) * (0.7025 + (n-1)) + bonus) * mult
     def get_abilitypower(self) -> float:
-        return self.abilitypower_flat * (1 + self.abilitypower_percent/100)
+        return self.abilitypower_flat * (1 + self.abilitypower_percent)
     def get_attack_time(self) -> float:
         atk_spd = ChampStatistic.ATTACK_SPEED_PERCENT
         base_attack_speed = 0.625/(1+self.attackspeed_offset)
         l = self.level
         level_bonus = self.attackspeed_perlevel/100 * ((7/400)*(l**2)+(267/400)*(l-1))
-        items_bonus = 0
-        for item in self.items:
-            for attribute in item.attribute_modifiers:
-                if attribute == atk_spd:
-                    items_bonus += attribute
-        buff_bonus = 0
-        for buff in self.buffs:
-            if atk_spd in buff.attribute_modifiers:
-                buff_bonus += buff.attribute_modifiers[atk_spd]
-        total_attack_speed = base_attack_speed * (1+level_bonus+items_bonus+buff_bonus)
+        total_attack_speed = base_attack_speed * (1+level_bonus+self.attackspeed_bonus_percent)
         return 1/total_attack_speed
     def gain_exp(self, exp_amount: int) -> None:
         assert(exp_amount > 0)
@@ -242,42 +305,78 @@ class Champion(AbstractMinion):
         hp_percent = self.hp / self.get_maxhp()
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
-    def add_stat_mod(self. stat:ChampStatistic, mod: float):
+    def add_stat_mod(self, stat:ChampStatistic, mod: float):
+        #Offensive:
         if stat == ChampStatistic.ATTACK_DAMAGE:
             self.attackdamage_bonus += mod
-        if stat == ChampStatistic.ATTACK_DAMAGE_BONUS_PERCENT:
+        elif stat == ChampStatistic.ATTACK_DAMAGE_BONUS_PERCENT:
             self.attackdamage_bonus_percent += mod
-        if stat == ChampStatistic.ATTACK_SPEED_PERCENT:
+        elif stat == ChampStatistic.ATTACK_SPEED_PERCENT:
             self.attackrange_bonus_percent += mod
-        if stat == ChampStatistic.ABILITY_POWER:
+        elif stat == ChampStatistic.ABILITY_POWER:
             self.abilitypower_flat += mod
-        if stat == ChampStatistic.ABILITY_POWER_PERCENT:
+        elif stat == ChampStatistic.ABILITY_POWER_PERCENT:
             self.abilitypower_percent += mod
-        if stat == ChampStatistic.CRIT_CHANCE #crit items
-        if stat == ChampStatistic.CRIT_DAMAGE #jhin/yasuo/ashe/shaco passives, fiora bladework # Defensive:
-        if stat == ChampStatistic.HP #many items
-        if stat == ChampStatistic.HP_BONUS_PERCENT #stoneplate active, several abilities
-        if stat == ChampStatistic.HP_REGEN #dorans shield, guardian horn, potions
-        if stat == ChampStatistic.HP_REGEN_PERCENT #many items
-        if stat == ChampStatistic.ARMOR #many items
-        if stat == ChampStatistic.ARMOR_PERCENT 
-        if stat == ChampStatistic.MAGIC_RESIST
-        if stat == ChampStatistic.TENACITY
-        if stat == ChampStatistic.SLOW_RESIST # Utility:
-        if stat == ChampStatistic.COOLDOWN_REDUCTION
-        if stat == ChampStatistic.MAX_COOLDOWN_REDUCTION
-        if stat == ChampStatistic.MANA
-        if stat == ChampStatistic.MANA_REGEN
-        if stat == ChampStatistic.MANA_REGEN_PERCENT
-        if stat == ChampStatistic.MANA_REGEN_IN_JUNGLE
-        if stat == ChampStatistic.ENERGY_REGEN
-        if stat == ChampStatistic.ENERGY_REGEN_PERCENT
-        if stat == ChampStatistic.HEAL_AND_SHIELD_POWER
-        if stat == ChampStatistic.MOVE_SPEED_FLAT
-        if stat == ChampStatistic.MOVE_SPEED_PERCENT
-        if stat == ChampStatistic.ATTACK_RANGE
-        if stat == ChampStatistic.ATTACK_RANGE_PERCENT
-        if stat == ChampStatistic.GOLD_GENERATION
+        elif stat == ChampStatistic.CRIT_CHANCE: #crit items
+            self.crit_bonus += mod
+        elif stat == ChampStatistic.CRIT_DAMAGE: #jhin/yasuo/shaco passives, fiora bladework
+            self.crit_damage_modifier += mod
+        
+        # Defensive:
+        elif stat == ChampStatistic.HP: #many items
+            self.hp_bonus += mod
+        elif stat == ChampStatistic.HP_BONUS_PERCENT: #stoneplate active, several abilities
+            self.hp_bonus_percent
+        elif stat == ChampStatistic.HP_REGEN: #dorans shield, guardian horn, potions
+            self.hpregen_bonus_base += mod
+        elif stat == ChampStatistic.HP_REGEN_PERCENT: #many items
+            self.hpregen_bonus_percent
+        elif stat == ChampStatistic.ARMOR: #many items
+            self.armor_bonus += mod
+        elif stat == ChampStatistic.ARMOR_PERCENT:
+            self.armor_bonus_percent += mod 
+        elif stat == ChampStatistic.MAGIC_RESIST:
+            self.spellblock_bonus += mod
+        elif stat == ChampStatistic.TENACITY:
+            self.tenacity += mod
+        elif stat == ChampStatistic.SLOW_RESIST:
+            self.slow_resist += mod
+        
+        # Utility:
+        elif stat == ChampStatistic.COOLDOWN_REDUCTION:
+            self.cooldown_reduction_spells += mod
+        elif stat == ChampStatistic.MAX_COOLDOWN_REDUCTION:
+            self.cooldown_reduction_spells_max += mod
+        elif stat == ChampStatistic.MANA:
+            if self.bartype == ResourceBarType.MANA:
+                self.mp_bonus += mod
+        elif stat == ChampStatistic.MANA_REGEN:
+            if self.bartype == ResourceBarType.MANA:
+                self.mpregen_bonus_flat += mod
+        elif stat == ChampStatistic.MANA_REGEN_PERCENT:
+            if self.bartype == ResourceBarType.MANA:
+                self.mpregen_bonus_percent += mod
+        elif stat == ChampStatistic.MANA_REGEN_IN_JUNGLE:
+            if self.bartype == ResourceBarType.MANA:
+                self.tooth = True
+        elif stat == ChampStatistic.ENERGY_REGEN:
+            if self.bartype == ResourceBarType.ENERGY:
+                self.mpregen_bonus_flat += mod
+        elif stat == ChampStatistic.ENERGY_REGEN_PERCENT:
+            if self.bartype == ResourceBarType.ENERGY:
+                self.mpregen_bonus_percent += mod
+        elif stat == ChampStatistic.HEAL_AND_SHIELD_POWER:
+            self.heal_shield_power += mod
+        elif stat == ChampStatistic.MOVE_SPEED_FLAT:
+            self.movespeed_bonus_flat += mod
+        elif stat == ChampStatistic.MOVE_SPEED_PERCENT:
+            self.movespeed_bonus_percent += mod
+        elif stat == ChampStatistic.ATTACK_RANGE:
+            self.attackrange_bonus_flat += mod
+        elif stat == ChampStatistic.ATTACK_RANGE_PERCENT:
+            self.attackrange_bonus_percent
+        elif stat == ChampStatistic.GOLD_GENERATION:
+            self.gp5 += mod
     def add_item(self, item:Item):
         pass
     def take_damage(self, attack: Damage) -> float:
