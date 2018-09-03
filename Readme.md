@@ -5,7 +5,7 @@ League of Legends.  It's not working yet.
 
 ## Usage
 
-1. Clone this repository: `git clone https://gitlab.com/Skyler827/Lol-calculator`
+1. Clone this repository: `git clone git@gitlab.com:Skyler827/Lol-calculator.git`
 2. Create a python3 virtual environment: `python3 -m venv venv` (or `python` if you are on windows)
 3. Activate the virtual environment:
 
