@@ -23,10 +23,16 @@ League of Legends.  It's not working yet.
 
 ## Roadmap
 
-Currently the tool simulates an autoattack fight between two champions, selected by the user.
-Items and levels are all editable. I will work on getting the items' effects to apply, then
-I will start work on programming all champions spells and spell effects,
-then I will implement a system for champions to determine which spells/autos/active items
-to use at a given time, then i will implement the Runes, then I will refine the funcitonality 
-into a well defined restful API, then I will make a front end web interface for that API,
-then i will put it online somewhere.
+1. Simulates an autoattack fight between two champions: **_Done_**
+2. Basic Web interface: **_Done_**
+3. Items and Champs are editable: **_Done_**
+4. Item basic stats apply correcly: _In progress_
+5. Basic Stats show in user interface: _Next_
+5. Health and Mana regeneration: _After that_
+5. Two champions' spells: _Later_
+6. Procedure for handling spell choice and timing: _Later_
+7. Combat Summoner Spells are incorporated: _Later_
+8. \~Twenty Champions' spells: _Later_
+9. Some Item Actives and effects: _later_
+10. Runes Reforged: _Later_
+11. All other champions' spells/other items: _Later_
