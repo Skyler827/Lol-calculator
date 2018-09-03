@@ -8,6 +8,7 @@ from mypy_extensions import TypedDict
 import sys
 sys.path.append(os.path.join(sys.path[0],"apps", "calc", "calc_core"))
 import champ_statistics as cs
+import fetch_images
 
 latest_patch: str = "8.16.1"
 this_directory = os.path.dirname(os.path.realpath(__file__))
@@ -182,12 +183,12 @@ def set_item_stats() -> None:
     create_and_populate_table("item_stats", columns, values)
 
 def main() -> None:
-    print("hello")
     check_directory()
     set_champs_table()
     set_statistics_table()
     set_item_table()
     set_item_recipes()
     set_item_stats()
+    fetch_images.main()
 if __name__ =="__main__":
     main()

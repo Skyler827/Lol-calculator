@@ -16,8 +16,6 @@ $(function() {
         var p_tag = document.createElement("p");
         p_tag.innerHTML = "Select a champion:";
         champ_select.appendChild(p_tag);
-        //TODO: write a django view for getting all the champs in json format
-        //      then write an ajax request here to get all the champ names
 
         for (let i=0; i< champ_ids_names.length; i++) {
             let div = document.createElement("div");

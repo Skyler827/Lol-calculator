@@ -69,6 +69,8 @@ def load_summoner_spell_images():
 
 def load_champion_spell_images():
     pass
-
-load_champ_images(latest_patch)
-load_item_images(latest_patch)
+def main():
+    load_champ_images(latest_patch)
+    load_item_images(latest_patch)
+if __name__ == "__main__":
+    main()
