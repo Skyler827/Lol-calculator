@@ -268,7 +268,7 @@ class Champion(AbstractMinion):
         g = self.hp_perlevel
         n = self.level
         bonus = self.hp_bonus
-        return b + g * (n-1) * (0.7025 + (n-1)) + bonus
+        return b + g * (n-1) * (0.7025 + 0.0175 * (n-1)) + bonus
     def get_maxmp(self) -> float:
         b = self.mp_base
         g = self.mp_perlevel
@@ -281,16 +281,19 @@ class Champion(AbstractMinion):
         n = self.level
         bonus = self.attackdamage_bonus
         mult = self.attackdamage_bonus_percent
-        return (b + g * (n-1) * (0.7025 + (n-1)) + bonus) * mult
+        return (b + g * (n-1) * (0.7025 + (n-1)) + bonus) * (1+mult)
     def get_abilitypower(self) -> float:
         return self.abilitypower_flat * (1 + self.abilitypower_percent)
     def get_attack_time(self) -> float:
-        atk_spd = ChampStatistic.ATTACK_SPEED_PERCENT
         base_attack_speed = 0.625/(1+self.attackspeed_offset)
         l = self.level
         level_bonus = self.attackspeed_perlevel/100 * ((7/400)*(l**2)+(267/400)*(l-1))
         total_attack_speed = base_attack_speed * (1+level_bonus+self.attackspeed_bonus_percent)
         return 1/total_attack_speed
+    def get_attack_range(self) -> float:
+        return (self.attackrange + self.attackrange_bonus_flat) * (1+self.attackrange_bonus_percent)
+    def get_movespeed() -> float:
+        return (self.movespeed_base + self.movespeed_bonus_flat) * (1+self.movespeed_bonus_percent)
     def gain_exp(self, exp_amount: int) -> None:
         assert(exp_amount > 0)
         self.exp += exp_amount
@@ -298,7 +301,7 @@ class Champion(AbstractMinion):
         while (self.level < should_be_level):
             self.level_up()
         assert(self.level == should_be_level)
-    def set_level(self, level:int):
+    def set_level(self, level:str):
         self.level = int(level)
         self.hp = self.get_maxhp()
     def level_up(self) -> None:

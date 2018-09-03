@@ -56,11 +56,12 @@ $(function() {
     });
     function get_items(color) {
         var item_ids = [];
-        $("."+color+"-champ img.item").each(function(element) {
-            if ($(this)[0].attributes.src.nodeValue == "/static/calc/img/black_square.png") {return;}
-            console.log($(this));
-            item_ids.push($(this)[0].attributes.src.nodeValue.slice(23,-4));
-        });
+        var imgs = document.querySelectorAll("."+color+"-champ img.item");
+        for (let i=0; i< imgs.length; i++) {
+            if (imgs[i].currentSrc != "http://localhost:8000/static/calc/img/black_square.png") {
+                item_ids.push(imgs[i].currentSrc.slice(44,48))
+            }
+        }
         return item_ids;
     }
     $("input.run-combat-submit").click(function(_e){
