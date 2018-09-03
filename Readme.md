@@ -12,19 +12,19 @@ League of Legends.  It's not working yet.
     Command for Mac and Linux (Bash): `source venv/bin/activate`
 
     Command for Windows (powershell or cmd): `. .\venv\Scripts\activate.ps1`
-        If you get a permission error, you will have to open a pwershell terminal as administrator and run the following command:
+    
+    If you get a permission error, open a pwershell terminal as administrator and run the following command:
         `Set-ExecutionPolicy Unrestricted`
 4. Update pip: `pip install --upgrade pip`
 5. Install required dependencies: `pip install -r requirements.txt`
 6. Run `python manage.py runserver`
 7. Request: `GET http://localhost:8000/initializedb` to initialize the list of champions and download the static images
-8. 
+8. View the web app at http://localhost:8000 in your browser.
 
 ## Roadmap
 
-Currently the tool simulates an autoattack fight between two hardcoded champions.  I will 
-first make the champions configurable, then make the items and levels configurable,
-then work on making sure all of the items' effects are correctly applied, then
+Currently the tool simulates an autoattack fight between two champions, selected by the user.
+Items and levels are all editable. I will work on getting the items' effects to apply, then
 I will start work on programming all champions spells and spell effects,
 then I will implement a system for champions to determine which spells/autos/active items
 to use at a given time, then i will implement the Runes, then I will refine the funcitonality 
