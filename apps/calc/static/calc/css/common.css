@@ -146,3 +146,14 @@ p.items-summs {
     background-color: lightgreen;
     color: black;
 }
+.event-list .winner {
+    font-style: italic;
+    font-size: 2rem;
+    display: block;
+}
+.event-list .winner.red-victory {
+    background-color: #622;
+}
+.event-list .winner.blue-victory {
+    background-color: #226;
+}

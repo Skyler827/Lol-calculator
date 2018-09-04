@@ -7,17 +7,6 @@ def get_status(blue_champ:c.Champion, red_champ:c.Champion, time_elapsed:float) 
         "blue_champ_hp":blue_champ.hp,
         "red_champ_hp":red_champ.hp,
     }
-def output_stats(champ:c.Champion) -> Dict:
-    return {
-        "AD": champ.get_attackdamage(),
-        "AP": champ.get_abilitypower(),
-        "AS": 1/champ.get_attack_time(),
-        "CDR":champ.cooldown_reduction_spells,
-        "Armor":champ.get_armor(),
-        "MR": champ.get_magic_resist(),
-        "AttackRange": champ.get_attack_range(),
-        "MS": champ.get_movespeed()
-    }
 def run_combat(blue_champion_name:str="Ahri", blue_champ_level:str='1', blue_champ_items:List[str]=[], 
         red_champion_name:str="Veigar", red_champ_level:str='1', red_champ_items:List[str]=[]):
     ## declaration:
@@ -90,20 +79,25 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:str='1', blue_cha
     winner = None
     if red_side_champ.hp > 0:
         winner = red_side_champ
+        winner_color = "red"
         red_champ_hp.append({"x": time_elapsed, "y":red_side_champ.hp})
         blue_champ_hp[-1]["y"] = 0
     elif blue_side_champ.hp > 0:
         winner = blue_side_champ
+        winner_color = "blue"
         blue_champ_hp.append({"x": time_elapsed, "y": blue_side_champ.hp})
         red_champ_hp[-1]["y"] = 0
     elif blue_side_champ.hp == red_side_champ.hp == 0:
         pass
     return {
         "blue_champ":blue_champion_name,
+        "blue_champ_stats": blue_side_champ.get_all_stats(),
         "red_champ": red_champion_name,
+        "red_champ_stats": red_side_champ.get_all_stats(),
         "initial": initial_status,
         "events": events,
         "winner": winner.name if winner else "draw",
+        "winner_color": winner_color if winner_color else "draw",
         "winner_hp": winner.hp if winner else 0,
         "blue_champ_hp": blue_champ_hp,
         "red_champ_hp": red_champ_hp

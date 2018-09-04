@@ -158,7 +158,8 @@ class Champion(AbstractMinion):
         conn = sqlite3.connect(db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        r:sqlite3.Row = c.execute("SELECT * FROM champions WHERE id=:name OR name=:name", {"name":name}).fetchone()
+        r: sqlite3.Row = c.execute("SELECT * FROM champions WHERE id=:name OR name=:name", {"name":name}).fetchone()
+        if len(r) == 0: raise ValueError("invalid champion name", name)
         self.name = name
         self.bartype:ResourceBarType = resourcebar_from_text(r["partype"])
 
@@ -211,7 +212,7 @@ class Champion(AbstractMinion):
         self.armor_reduction_percent:float = 0
 
         self.spellblock_base:float = r["spellblock"]
-        self.spellblock_perlevel:float = ["spellblockperlevel"]
+        self.spellblock_perlevel:float = r["spellblockperlevel"]
         self.spellblock_bonus:float = 0
         self.spellblock_bonus_percent:float = 0
         self.spellblock_reduction_flat:float = 0
@@ -307,11 +308,22 @@ class Champion(AbstractMinion):
     def set_level(self, level:str):
         self.level = int(level)
         self.hp = self.get_maxhp()
+    def get_all_stats(self):
+        return {
+            "AD": self.get_attackdamage(),
+            "AP": self.get_abilitypower(),
+            "Armor": self.get_armor(),
+            "MR": self.get_magic_resist(),
+            "AttackSpeed": 1/self.get_attack_time(),
+            "CDR": self.cooldown_reduction_spells,
+            "AttackRange": self.get_attack_range(),
+            "MoveSpeed": self.get_movespeed()
+        }
     def level_up(self) -> None:
         hp_percent = self.hp / self.get_maxhp()
         self.level += 1
         self.hp = hp_percent * self.get_maxhp()
-    def add_stat_mod(self, stat:ChampStatistic, mod: float):
+    def add_stat_mod(self, stat:ChampStatistic, mod: float, initial=True):
         #Offensive:
         if stat == ChampStatistic.ATTACK_DAMAGE:
             self.attackdamage_bonus += mod
@@ -331,10 +343,12 @@ class Champion(AbstractMinion):
         # Defensive:
         elif stat == ChampStatistic.HP: #many items
             self.hp_bonus += mod
-            self.hp = self.get_maxhp()
+            if initial:
+                self.hp = self.get_maxhp()
         elif stat == ChampStatistic.HP_BONUS_PERCENT: #stoneplate active, several abilities
             self.hp_bonus_percent
-            self.hp = self.get_maxhp()
+            if initial:
+                self.hp = self.get_maxhp()
         elif stat == ChampStatistic.HP_REGEN: #dorans shield, guardian horn, potions
             self.hpregen_bonus_base += mod
         elif stat == ChampStatistic.HP_REGEN_PERCENT: #many items
@@ -358,6 +372,8 @@ class Champion(AbstractMinion):
         elif stat == ChampStatistic.MANA:
             if self.bartype == ResourceBarType.MANA:
                 self.mp_bonus += mod
+                if initial:
+                    self.mp = self.get_maxmp()
         elif stat == ChampStatistic.MANA_REGEN:
             if self.bartype == ResourceBarType.MANA:
                 self.mpregen_bonus_flat += mod

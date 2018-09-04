@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from .calc_core import initializedb as init
 from .calc_core.timer import run_combat
 latest_patch: str = "8.16.1"
@@ -30,15 +30,22 @@ def get_item_ids(request):
     conn.commit()
     return JsonResponse(data, safe=False)
 def simulate_combat(request):
-    x = run_combat(
-        blue_champion_name=request.GET["blue_champ"],
-        blue_champ_level=request.GET["blue_level"],
-        blue_champ_items=request.GET.getlist("blue_items[]"),
-        red_champion_name=request.GET["red_champ"],
-        red_champ_level=request.GET["red_level"],
-        red_champ_items=request.GET.getlist("red_items[]")
-    )
-    return JsonResponse({
-        "blue-champ": x["blue_champ_hp"],
-        "red-champ": x["red_champ_hp"],
-    })
+    try:
+        x = run_combat(
+            blue_champion_name=request.GET["blue_champ"],
+            blue_champ_level=request.GET["blue_level"],
+            blue_champ_items=request.GET.getlist("blue_items[]"),
+            red_champion_name=request.GET["red_champ"],
+            red_champ_level=request.GET["red_level"],
+            red_champ_items=request.GET.getlist("red_items[]")
+        )
+        return JsonResponse({
+            "blue-champ": x["blue_champ_hp"],
+            "blue_champ_stats": x["blue_champ_stats"],
+            "red-champ": x["red_champ_hp"],
+            "red_champ_stats": x["red_champ_stats"],
+            "winner": x["winner"],
+            "winner_color": x["winner_color"],
+        })
+    except ValueError:
+        return HttpResponseBadRequest()

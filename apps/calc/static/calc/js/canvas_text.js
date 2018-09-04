@@ -109,11 +109,11 @@ $(function() {
                 for (let i=0; i< xhr_red_data.length; i++) {
                     chart_red_data.push(xhr_red_data[i]);
                 }
-                myChart.update()
+                myChart.update();
+                $(".winner").remove();
+                $(".event-list").prepend("<span class='winner "+data.winner_color+"-victory'>"+data.winner+" wins!</span>");
             }),
-            error: function(data) {
-                console.log(data);
-            }
+            error: function(_) {}
         });
     });
 });
