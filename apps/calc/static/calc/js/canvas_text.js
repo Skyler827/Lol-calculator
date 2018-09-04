@@ -8,8 +8,8 @@ $(function() {
                 data: [
                 ],
                 backgroundColor: 'rgba(0, 0, 160, 0.2)',
-                borderColor: 'rgba(20, 20, 255, 0.8)',
-                borderWidth: 1,
+                borderColor: 'rgba(100, 100, 255, 1)',
+                borderWidth: 2,
                 showLine: true,
                 lineTension: 0,
             }, {
@@ -18,24 +18,29 @@ $(function() {
                 ],
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255,99,132,1)',
-                borderWidth: 1,
+                borderWidth: 2,
                 showLine: true,
                 lineTension: 0,
             }
         ]
         },
         options: {
+            legend: {
+                labels: {
+                    fontColor: "white"
+                }
+            },
             scales: {
                 yAxes: [{
                     ticks: {
                         min: 0,
                         beginAtZero:true
-                    }
+                    },
                 }],
                 xAxes: [{
                     ticks: {
                         min: 0,
-                    }
+                    },
                 }]
             },
             tooltips: {
@@ -46,7 +51,7 @@ $(function() {
                         if (label) {
                             label += ': ';
                         }
-                        label += tooltipItem.yLabel.toFixed(2);
+                        label += tooltipItem.yLabel.toFixed(0);
                         return label;
                     }
                 }

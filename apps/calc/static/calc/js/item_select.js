@@ -50,6 +50,7 @@ $(function() {
                 let src = "/static/calc/img/items/"+items[i][0]+".png"
                 console.log(src);
                 $(target).find("img").attr("src", src);
+                $("input.run-combat-submit").click();
                 $(item_selector).dialog("close");
             });
         }

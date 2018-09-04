@@ -142,6 +142,7 @@ p.items-summs {
     overflow: auto;
 }
 .event-list .run-combat-submit {
+    display: none;
     background-color: lightgreen;
     color: black;
 }

@@ -25,16 +25,16 @@ def load_champ_images(patch):
     conn = sqlite3.connect(os.path.join(project_root_folder, "data", patch, "league_data.db"))
     cur = conn.cursor()
     cur.execute("SELECT id FROM champions")
-    champ_ascii_names = cur.fetchall()
+    champ_ascii_names = [row[0] for row in cur.fetchall()]
     cur.close()
     conn.close()
     champs_whose_img_exist = 0
     for champ_name in champ_ascii_names:
-        file_path = os.path.join(static_foler, "calc", "img", "champ_square", champ_name[0]+".png")
+        file_path = os.path.join(static_foler, "calc", "img", "champ_square", champ_name+".png")
         if os.path.exists(file_path):
             champs_whose_img_exist += 1
             continue
-        url = f"http://ddragon.leagueoflegends.com/cdn/{patch}/img/champion/{champ_name[0]}.png"
+        url = f"http://ddragon.leagueoflegends.com/cdn/{patch}/img/champion/{champ_name}.png"
         response = urllib.request.urlopen(url)
         image_file = open(file_path, mode='wb')
         image_file.write(response.read())

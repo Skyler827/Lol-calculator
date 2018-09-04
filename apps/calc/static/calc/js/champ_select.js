@@ -37,6 +37,7 @@ $(function() {
                 $("."+color+"-champ .inner-champ-div .champ-icon").attr("src", champ_path);
                 $("."+color+"-champ .inner-champ-div .clickable-image-container div.middle").hide();
                 $("."+color+"-champ .inner-champ-div p.champ-name").text(champ_ids_names[i][1]);
+                $("input.run-combat-submit").click();
                 $(champ_select).dialog("close");
             });
         }

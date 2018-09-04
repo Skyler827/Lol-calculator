@@ -120,12 +120,12 @@ class onHitEffect():
     def apply_effect(self, target):
         target
 class Item:
-    def __init__(self, attribute_modifiers:List[Tuple[ChampStatistic, float]], 
+    def __init__(self, name:str, attribute_modifiers:List[Tuple[ChampStatistic, float]], 
     unique_passives:List[Tuple[str,Tuple[ChampStatistic, int]]]=[], passive_effect:Buff=None):
-
         self.attribute_modifiers = attribute_modifiers
         self.unique_passives = unique_passives
         self.passive_effect = passive_effect
+        self.name:str = name
 def load_item(item_id:str) -> Item:
     conn = sqlite3.connect(db_name)
     conn.row_factory = sqlite3.Row
@@ -134,7 +134,10 @@ def load_item(item_id:str) -> Item:
         "JOIN item_stats ON item_stats.stat=champ_statistics.id WHERE item_stats.item=:id"
     stats = c.execute(sql, {"id":item_id}).fetchall()
     attr:List[Tuple[ChampStatistic, float]] = list(map(lambda row: (eval("ChampStatistic."+row[0]), float(row[1])), stats))
-    return Item(attribute_modifiers=attr)
+    item_name = c.execute("SELECT name FROM items WHERE id=:id", {"id":item_id}).fetchone()[0]
+    c.close()
+    conn.close()
+    return Item(name=item_name, attribute_modifiers=attr)
 class Tenacity_obj():
     """
     all values are unit fractions, such as 0.05 + 0.05 = 0.1 implies 90% CC duration
@@ -292,7 +295,7 @@ class Champion(AbstractMinion):
         return 1/total_attack_speed
     def get_attack_range(self) -> float:
         return (self.attackrange + self.attackrange_bonus_flat) * (1+self.attackrange_bonus_percent)
-    def get_movespeed() -> float:
+    def get_movespeed(self) -> float:
         return (self.movespeed_base + self.movespeed_bonus_flat) * (1+self.movespeed_bonus_percent)
     def gain_exp(self, exp_amount: int) -> None:
         assert(exp_amount > 0)
@@ -315,7 +318,7 @@ class Champion(AbstractMinion):
         elif stat == ChampStatistic.ATTACK_DAMAGE_BONUS_PERCENT:
             self.attackdamage_bonus_percent += mod
         elif stat == ChampStatistic.ATTACK_SPEED_PERCENT:
-            self.attackrange_bonus_percent += mod
+            self.attackspeed_bonus_percent += mod
         elif stat == ChampStatistic.ABILITY_POWER:
             self.abilitypower_flat += mod
         elif stat == ChampStatistic.ABILITY_POWER_PERCENT:
@@ -328,8 +331,10 @@ class Champion(AbstractMinion):
         # Defensive:
         elif stat == ChampStatistic.HP: #many items
             self.hp_bonus += mod
+            self.hp = self.get_maxhp()
         elif stat == ChampStatistic.HP_BONUS_PERCENT: #stoneplate active, several abilities
             self.hp_bonus_percent
+            self.hp = self.get_maxhp()
         elif stat == ChampStatistic.HP_REGEN: #dorans shield, guardian horn, potions
             self.hpregen_bonus_base += mod
         elif stat == ChampStatistic.HP_REGEN_PERCENT: #many items

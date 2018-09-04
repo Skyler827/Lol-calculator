@@ -29,7 +29,8 @@ def run_combat(blue_champion_name:str="Ahri", blue_champ_level:str='1', blue_cha
 
     ## items
     for item_id in blue_champ_items:
-        for stat, mod in c.load_item(item_id).attribute_modifiers:
+        item_obj:c.Item = c.load_item(item_id)
+        for stat, mod in item_obj.attribute_modifiers:
             blue_side_champ.add_stat_mod(stat, mod)
     for item_id in red_champ_items:
         for stat, mod in c.load_item(item_id).attribute_modifiers:
