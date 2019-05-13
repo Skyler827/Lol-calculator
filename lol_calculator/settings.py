@@ -20,7 +20,7 @@ try:
     with open('/home/ubuntu/secretkey.txt') as f:
         SECRET_KEY = f.read().strip()
         DEBUG = False
-        ALLOWED_HOSTS = ['lol-statcheck.com']
+        ALLOWED_HOSTS = ['lol-statcheck.com', '127.0.0.1']
 
         SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
         SECURE_CONTENT_TYPE_NOSNIFF = True
