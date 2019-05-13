@@ -21,6 +21,15 @@ try:
         SECRET_KEY = f.read().strip()
         DEBUG = False
         ALLOWED_HOSTS = ['lol-statcheck.com']
+
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+        SECURE_CONTENT_TYPE_NOSNIFF = True
+        SECURE_BROWSER_XSS_FILTER = True
+        SECURE_SSL_REDIRECT = True
+        SESSION_COOKIE_SECURE = True
+        X_FRAME_OPTIONS = 'DENY'
+        CSRF_COOKIE_SECURE = True
+
 except:
     # Development settings:
     SECRET_KEY = '+l08*en5c6mu!w%%9f7(nuw@#1+-r-f=pwzdh(y0w0f)+s4m8x'
