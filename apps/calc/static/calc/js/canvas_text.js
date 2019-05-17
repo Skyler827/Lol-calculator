@@ -63,8 +63,10 @@ $(function() {
         var item_ids = [];
         var imgs = document.querySelectorAll("."+color+"-champ img.item");
         for (let i=0; i< imgs.length; i++) {
-            if (imgs[i].currentSrc != "http://localhost:8000/static/calc/img/black_square.png") {
-                item_ids.push(imgs[i].currentSrc.slice(44,48))
+            let imgId = imgs[i].currentSrc.split('/').slice(-1)[0].slice(0,-4);
+            console.log(imgId);
+            if (imgId !== "black_square") {
+                item_ids.push(imgId.slice(0,4));
             }
         }
         return item_ids;
